@@ -60,6 +60,10 @@ const pname = p => (S.lang === 'ml' && p.name_ml ? p.name_ml : p.name);
 const catById = id => S.cats.find(c => c.id === id);
 const effPrice = p => (p.discount_price && p.discount_price < p.price ? p.discount_price : p.price);
 const imgUrl = u => (u && String(u).startsWith(CONFIG.SUPABASE_URL + '/storage/') ? u : '');
+const pimgs = p => [p.image, p.image2, p.image3].map(imgUrl).filter(Boolean);
+const adLabel = () => (S.lang === 'ml' ? 'പരസ്യം' : 'Ad');
+const addDays = (d, n) => { const x = new Date(d + 'T00:00:00Z'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); };
+const priceOf = k => { const n = parseInt(setting(k), 10); return n > 0 ? n : 0; };
 const isFeatured = s => !!(s.featured_until && s.featured_until >= todayIST());
 
 let sb = null;
@@ -191,6 +195,20 @@ function shopCard(s) {
         ${s.pickup_available ? html`<span class="tag">🏬 ${t('pickup')}</span>` : ''}
       </div></div></article>`;
 }
+async function loadAds() {
+  try { const today = todayIST(); const r = await sb.from('ads').select('*, shops(name,slug,town)').eq('status', 'approved').lte('starts_on', today).gte('ends_on', today).order('id', { ascending: false }).limit(20); return r.error ? [] : (r.data || []).filter(a => a.shops); } catch (e) { return []; }
+}
+function adBanner(a) {
+  const img = imgUrl(a.image); const href = a.product_id ? `#/p/${a.product_id}` : `#/s/${enc(a.shops.slug)}`;
+  return html`<a class="adbanner" href="${href}" aria-label="${adLabel()}: ${a.title}"><span class="adtag">${adLabel()}</span>${img ? html`<img src="${img}" alt="" loading="lazy" width="320" height="160">` : ''}
+    <span class="adtext"><b>${a.title}</b>${a.body ? html`<span>${a.body}</span>` : ''}<small>🏪 ${a.shops.name}${a.shops.town ? ', ' + a.shops.town : ''}</small></span></a>`;
+}
+function gridWithAds(products, ads, every = 6) {
+  const out = []; let k = 0;
+  products.forEach((p, i) => { out.push(productCard(p)); if (ads.length && (i + 1) % every === 0 && i + 1 < products.length) out.push(adBanner(ads[k++ % ads.length])); });
+  if (ads.length && products.length && products.length < every) out.push(adBanner(ads[0]));
+  return html`<div class="cards">${out}</div>`;
+}
 const statusBadge = s => html`<span class="status st-${s}">${t('s_' + s)}</span>`;
 function pager(page, pages, base) {
   if (pages <= 1) return '';
@@ -237,10 +255,11 @@ const route = (pattern, fn) => routes.push([new RegExp('^' + pattern + '$'), fn]
 
 route('/', async () => {
   const ids = await placeShopIds();
-  const [shops, fresh, prods] = await Promise.all([
+  const [ads, shops, fresh, prods] = await Promise.all([
+    loadAds(),
     shopsQ().order('featured_until', { ascending: false, nullsFirst: false }).limit(12),
     shopsQ().order('approved_at', { ascending: false }).limit(6),
-    productsQ(ids).order('id', { ascending: false }).limit(40),
+    productsQ(ids).order('id', { ascending: false }).limit(60),
   ]);
   const shopList = sortFeatured(must(shops)); const featured = shopList.filter(isFeatured).length ? shopList.filter(isFeatured).slice(0, 8) : shopList.slice(0, 4);
   const products = must(prods);
@@ -265,7 +284,7 @@ route('/', async () => {
     ${featured.length ? html`<div class="shopcards">${featured.map(shopCard)}</div>` : emptyBox(t('no_shops_yet'), `<br><br><a class="btn" href="#/register">${esc(t('register_shop'))}</a>`)}
   </div></section>
   ${offers.length ? html`<section class="block"><div class="wrap"><h2>🏷️ ${t('offers')}</h2><div class="cards">${offers.map(productCard)}</div></div></section>` : ''}
-  ${products.length ? html`<section class="block"><div class="wrap"><h2>${t('popular_products')}</h2><div class="cards">${products.slice(0, 12).map(productCard)}</div></div></section>` : ''}
+  ${products.length ? html`<section class="block"><div class="wrap"><h2>${t('popular_products')}</h2>${gridWithAds(products.slice(0, 30), ads)}</div></section>` : ''}
   ${must(fresh).length ? html`<section class="block"><div class="wrap"><h2>🆕 ${t('new_shops')}</h2><div class="shopcards">${must(fresh).map(shopCard)}</div></div></section>` : ''}
   <section class="block"><div class="wrap"><div class="panel center"><h2>${t('register_shop')}</h2>
     <p>Free starter plan. Your own shop page, WhatsApp orders, and local delivery or pickup — no technical knowledge needed.</p>
@@ -276,7 +295,7 @@ route('/', async () => {
 route('/shops', async (_m, q) => {
   const everywhere = q.get('all') === '1'; const slug = q.get('category') || ''; const cat = S.cats.find(c => c.slug === slug); const page = pageNum(q);
   const [a, b] = range(page);
-  const res = await shopsQ({ count: true, everywhere, catId: cat && cat.id }).order('name').range(a, b);
+  const res = await shopsQ({ count: true, everywhere, catId: cat && cat.id }).order('featured_until', { ascending: false, nullsFirst: false }).order('name').range(a, b);
   const shops = sortFeatured(must(res)); const pages = Math.ceil((res.count || 0) / PER_PAGE);
   const base = '#/shops?' + (cat ? 'category=' + enc(cat.slug) : '') + (everywhere ? '&all=1' : '');
   view(html`
@@ -291,15 +310,16 @@ route('/shops', async (_m, q) => {
 route('/category/([^/]+)', async ([slug], q) => {
   const cat = S.cats.find(c => c.slug === slug); if (!cat) return notFound();
   const page = pageNum(q); const [a, b] = range(page); const ids = await placeShopIds();
-  const [sres, pres] = await Promise.all([
-    shopsQ({ catId: cat.id }).order('name').limit(12),
+  const [ads, sres, pres] = await Promise.all([
+    loadAds(),
+    shopsQ({ catId: cat.id }).order('featured_until', { ascending: false, nullsFirst: false }).order('name').limit(12),
     productsQ(ids, true).eq('category_id', cat.id).order('id', { ascending: false }).range(a, b),
   ]);
   const products = must(pres);
   view(html`<div class="wrap" style="padding:20px 16px"><h1>${cat.icon} ${cname(cat)}</h1>
     ${must(sres).length ? html`<h2>${t('shops')}</h2><div class="shopcards mb">${sortFeatured(must(sres)).map(shopCard)}</div>` : ''}
     <h2>${t('products')}</h2>
-    ${products.length ? html`<div class="cards">${products.map(productCard)}</div>${pager(page, Math.ceil((pres.count || 0) / PER_PAGE), '#/category/' + enc(cat.slug))}` : emptyBox(t('no_products_yet'))}</div>`,
+    ${products.length ? html`${gridWithAds(products, ads)}${pager(page, Math.ceil((pres.count || 0) / PER_PAGE), '#/category/' + enc(cat.slug))}` : emptyBox(t('no_products_yet'))}</div>`,
     { title: `${cat.name_en} in your town | ${siteName()}`, desc: `Buy ${cat.name_en.toLowerCase()} from local shops in Kerala.` });
 });
 
@@ -370,12 +390,13 @@ route('/p/(\\d+)', async ([id]) => {
   const p = must(await sb.from('products').select('*, shops(*), categories(name_en,name_ml,icon,slug)').eq('id', id).maybeSingle());
   if (!p || !p.shops || p.blocked || !p.active || p.shops.status !== 'approved') return notFound();
   const shop = p.shops; const more = must(await sb.from('products').select(PROD_SEL).eq('shop_id', shop.id).eq('active', true).eq('blocked', false).neq('id', p.id).order('id', { ascending: false }).limit(6));
-  const disc = p.discount_price && p.discount_price < p.price; const img = imgUrl(p.image); const cat = p.categories || {};
+  const disc = p.discount_price && p.discount_price < p.price; const img = pimgs(p)[0]; const cat = p.categories || {};
   const msg = `Hello, I am interested in ${p.name} (${inr(effPrice(p))}) from ${shop.name} on ${siteName()}.`;
   view(html`<div class="wrap">
     <p class="small muted" style="margin-top:14px"><a href="#/">${t('home')}</a> › <a href="#/s/${enc(shop.slug)}">${shop.name}</a> › ${pname(p)}</p>
     <div class="pdp">
-      <div class="bigimg">${img ? html`<img src="${img}" alt="${pname(p)}" width="700" height="700">` : html`<span aria-hidden="true">${cat.icon || '🛍️'}</span>`}</div>
+      <div><div class="bigimg">${img ? html`<img id="mainimg" src="${img}" alt="${pname(p)}" width="700" height="700">` : html`<span aria-hidden="true">${cat.icon || '🛍️'}</span>`}</div>
+        ${pimgs(p).length > 1 ? html`<div class="thumbs">${pimgs(p).map((u, i) => html`<button class="thumbbtn" type="button" data-act="gal" data-src="${u}" aria-label="Photo ${i + 1}"><img src="${u}" alt="" width="64" height="64" loading="lazy"></button>`)}</div>` : ''}</div>
       <div><h1>${pname(p)}</h1>${p.name_ml && S.lang === 'en' ? html`<p class="muted">${p.name_ml}</p>` : (p.name_ml ? html`<p class="muted">${p.name}</p>` : '')}
         <div class="price" style="font-size:1.8rem">${inr(effPrice(p))}${disc ? html`<s>${inr(p.price)}</s> <span class="tag red">${100 - Math.floor(p.discount_price * 100 / p.price)}% OFF</span>` : ''}</div>
         ${p.unit ? html`<p class="muted">${p.unit}</p>` : ''}
@@ -533,7 +554,7 @@ route('/pricing', async () => {
   <div class="panel" style="margin-top:20px"><h2>All charges explained</h2><ul>
     <li><b>Starter plan:</b> free, no card or payment details needed.</li>
     <li><b>Paid plans:</b> optional. A paid plan starts only after the marketplace team confirms they have received your payment, and it is valid for the period they set.</li>
-    <li><b>Featured listing:</b> ${setting('featured_price_note')}</li><li><b>Local advertisements:</b> ${setting('ad_note')}</li>
+    <li><b>Promote your shop (shown first in lists):</b> ${priceOf('promote_price_week') ? html`<b>${inr(priceOf('promote_price_week'))} per week.</b>` : ''} ${setting('featured_price_note')}</li><li><b>Banner advertisements (home and category pages, marked “Ad”):</b> ${priceOf('ad_price_week') ? html`<b>${inr(priceOf('ad_price_week'))} per week.</b>` : ''} ${setting('ad_note')}</li>
     <li><b>Order commission:</b> ${pct > 0 ? html`${pct}% of the item value of each <i>delivered</i> order. Commission is recorded in your account and settled with the marketplace team outside the website.` : 'Currently 0%. If a commission is introduced, it will be shown here and shop owners will be informed before it applies.'}</li>
     <li><b>Payments:</b> Customer orders are paid directly to the shop (cash on delivery or at the shop); the website does not take customers' money. Shops can pay plan fees to the marketplace by UPI or Razorpay when enabled; the team confirms each payment before activating a plan, and records it in your account.</li></ul>
     <a class="btn gold" href="#/register">${t('register_shop')}</a></div></div>`,
@@ -644,7 +665,7 @@ function ownerGuard() {
 function dashLayout(active, inner, title) {
   const sh = S.shop; const link = (path, label) => html`<a class="${active === path ? 'on' : ''}" href="#/dashboard${path}">${label}</a>`;
   view(html`<div class="wrap"><div class="dash">
-    <nav class="side" aria-label="Dashboard">${link('', '📊 Overview')}${link('/products', '📦 ' + t('products'))}${link('/orders', '🧾 ' + t('orders'))}${link('/reports', '📈 ' + t('reports'))}${link('/settings', '⚙️ ' + t('settings'))}${link('/plan', '⭐ ' + t('subscription'))}${link('/support', '💬 ' + t('support'))}${link('/password', '🔒 Password')}<a href="#/s/${enc(sh.slug)}">🏪 ${t('view_shop')}</a></nav>
+    <nav class="side" aria-label="Dashboard">${link('', '📊 Overview')}${link('/products', '📦 ' + t('products'))}${link('/orders', '🧾 ' + t('orders'))}${link('/reports', '📈 ' + t('reports'))}${link('/settings', '⚙️ ' + t('settings'))}${link('/plan', '⭐ ' + t('subscription'))}${link('/promote', '📣 Promote & Ads')}${link('/support', '💬 ' + t('support'))}${link('/password', '🔒 Password')}<a href="#/s/${enc(sh.slug)}">🏪 ${t('view_shop')}</a></nav>
     <div>${sh.status === 'pending' ? html`<div class="notice">⏳ ${t('pending_notice')}</div>` : ''}
       ${sh.status === 'rejected' ? html`<div class="flash error">Your shop was not approved${sh.status_note ? ': ' + sh.status_note : ''}. Fix your details in Shop settings or contact support.</div>` : ''}
       ${sh.status === 'suspended' ? html`<div class="flash error">Your shop is suspended and hidden from customers${sh.status_note ? ': ' + sh.status_note : ''}. Please contact support.</div>` : ''}
@@ -695,10 +716,11 @@ route('/dashboard/product/(new|\\d+)', async ([id]) => {
     <label for="f_description">Description (optional)</label><textarea id="f_description" name="description" maxlength="1000">${v.description || ''}</textarea>
     <div class="grid2"><div>${field('Stock quantity (optional)', 'stock_qty', v.stock_qty ?? '', 'type="number" min="0" inputmode="numeric"')}<p class="hint">Leave empty if you do not want to count stock. A number reduces with every order.</p></div>
       <div>${checkbox(t('in_stock'), 'in_stock', !p || v.in_stock)}${checkbox('Show to customers', 'active', !p || v.active)}</div></div>
-    <label for="f_image">Photo (JPG, PNG or WebP)</label>
-    ${imgUrl(v.image) ? html`<img src="${imgUrl(v.image)}" alt="" width="120" height="120" style="border-radius:12px;margin-bottom:8px;object-fit:cover">` : ''}
-    <img id="preview" alt="" width="120" height="120" style="display:none;border-radius:12px;margin-bottom:8px;object-fit:cover">
-    <input id="f_image" type="file" name="image" accept="image/jpeg,image/png,image/webp" data-preview="preview">
+    <label>Photos (up to 3 — JPG, PNG or WebP). The first one is the main photo.</label>
+    <div class="photoslots">${['image', 'image2', 'image3'].map((k, i) => html`<div class="photoslot"><b class="small">Photo ${i + 1}</b>
+      ${imgUrl(v[k]) ? html`<img src="${imgUrl(v[k])}" alt="" width="110" height="110">${checkbox('Remove', 'rm_' + k, false)}` : ''}
+      <img id="preview_${k}" alt="" width="110" height="110" style="display:none">
+      <input type="file" name="${k}" accept="image/jpeg,image/png,image/webp" data-preview="preview_${k}" aria-label="Photo ${i + 1}"></div>`)}</div>
     <div class="row" style="margin-top:18px"><button class="btn gold" type="submit">${t('save')}</button><a class="btn ghost" href="#/dashboard/products">${t('cancel')}</a></div></form>`, 'Product');
 });
 
@@ -785,18 +807,22 @@ route('/dashboard/plan', async () => {
   renderQRs();
 });
 
-function payBox(p, sh) {
-  const upi = setting('upi_id'), rz = setting('razorpay_key_id'); const note = `${siteName()} ${p.name} plan - ${sh.name}`.slice(0, 50);
-  const link = upi ? `upi://pay?pa=${enc(upi)}&pn=${enc(setting('upi_name') || siteName())}&am=${p.price}&cu=INR&tn=${enc(note)}` : '';
-  if (!upi && !rz) return html`<div class="notice small">Online payment is not switched on yet (the marketplace admin must add a UPI ID or Razorpay key in Admin → Settings).</div><button class="btn small block" type="button" data-act="planrequest" data-id="${p.id}" data-name="${p.name}">Request this plan</button>`;
+function payOptions(o) { // o = {amount, note, type: plan|promo|ad, id}
+  const upi = setting('upi_id'), rz = setting('razorpay_key_id'); if (!upi && !rz) return '';
+  const link = upi ? `upi://pay?pa=${enc(upi)}&pn=${enc(setting('upi_name') || siteName())}&am=${o.amount}&cu=INR&tn=${enc(String(o.note).slice(0, 50))}` : '';
+  const d = `data-type="${o.type}" data-id="${o.id}" data-amount="${o.amount}"`;
   return html`<div class="stack-s">
-    ${rz ? html`<button class="btn gold small block" type="button" data-act="razorpay" data-id="${p.id}">💳 Pay ${inr(p.price)} with Razorpay</button>` : ''}
-    ${upi ? html`<div style="margin-top:8px"><b class="small">Pay ${inr(p.price)} by UPI</b>
+    ${rz ? html`<button class="btn gold small block" type="button" data-act="razorpay" ${raw(d)}>💳 Pay ${inr(o.amount)} with Razorpay</button>` : ''}
+    ${upi ? html`<div style="margin-top:8px"><b class="small">Pay ${inr(o.amount)} by UPI</b>
       <p class="small">UPI ID: <b>${upi}</b>${setting('upi_name') ? ' (' + setting('upi_name') + ')' : ''}<br><a class="btn small" href="${link}">Open UPI app (phone)</a></p>
-      <div class="qr" data-qr="${link}" style="margin:6px 0"></div><p class="hint">On a computer, scan the QR with any UPI app. Pay exactly ${inr(p.price)}.</p>
-      <form data-form="upiclaim" data-id="${p.id}"><label class="small" for="utr${p.id}">After paying, enter the UPI reference / UTR number</label>
-      <input id="utr${p.id}" name="ref" required minlength="6" maxlength="40" autocomplete="off"><button class="btn small" style="margin-top:8px" type="submit">I have paid</button></form></div>` : ''}
-    <button class="btn ghost small block" style="margin-top:8px" type="button" data-act="planrequest" data-id="${p.id}" data-name="${p.name}">Request without paying now</button></div>`;
+      <div class="qr" data-qr="${link}" style="margin:6px 0"></div><p class="hint">On a computer, scan the QR with any UPI app. Pay exactly ${inr(o.amount)}.</p>
+      <form data-form="upiclaim" ${raw(d)}><label class="small">After paying, enter the UPI reference / UTR number</label>
+      <input name="ref" required minlength="6" maxlength="40" autocomplete="off"><button class="btn small" style="margin-top:8px" type="submit">I have paid</button></form></div>` : ''}</div>`;
+}
+function payBox(p, sh) {
+  const opts = payOptions({ amount: p.price, note: `${siteName()} ${p.name} plan - ${sh.name}`, type: 'plan', id: p.id });
+  if (!opts.s) return html`<div class="notice small">Online payment is not switched on yet (the marketplace admin must add a UPI ID or Razorpay key in Admin → Settings).</div><button class="btn small block" type="button" data-act="planrequest" data-id="${p.id}" data-name="${p.name}">Request this plan</button>`;
+  return html`${opts}<button class="btn ghost small block" style="margin-top:8px" type="button" data-act="planrequest" data-id="${p.id}" data-name="${p.name}">Request without paying now</button>`;
 }
 function renderQRs() {
   const boxes = document.querySelectorAll('.qr[data-qr]'); if (!boxes.length) return;
@@ -808,9 +834,47 @@ function loadRazorpay() {
 }
 async function claimPlan(planId, method, ref, amount) {
   const ex = must(await sb.from('plan_requests').select('id').eq('shop_id', S.shop.id).eq('status', 'open'));
-  if (ex.length) must(await sb.from('plan_requests').update({ plan_id: planId, pay_method: method, pay_ref: ref, amount }).eq('id', ex[0].id));
+  if (ex.length) { const r = must(await sb.from('plan_requests').update({ plan_id: planId, pay_method: method, pay_ref: ref, amount }).eq('id', ex[0].id).select('id')); if (!r.length) throw new Error('Could not save the payment reference. Please contact support with it.'); }
   else must(await sb.from('plan_requests').insert({ shop_id: S.shop.id, plan_id: planId, pay_method: method, pay_ref: ref, amount }));
 }
+async function claimPay(type, id, method, ref, amount) {
+  if (type === 'plan') return claimPlan(Number(id), method, ref, amount);
+  const table = type === 'ad' ? 'ads' : 'promo_requests';
+  const r = must(await sb.from(table).update({ pay_method: method, pay_ref: ref }).eq('id', id).eq('shop_id', S.shop.id).select('id'));
+  if (!r.length) throw new Error('Could not save the payment reference. Please contact support with it.');
+}
+
+const claimView = r => r.pay_ref ? html`<p class="small">✅ Payment reported: <b>${r.pay_method.toUpperCase()}</b> · ${r.pay_ref}. Waiting for the team to confirm.</p>` : '';
+route('/dashboard/promote', async () => {
+  if (!ownerGuard()) return; const sh = S.shop; const pp = priceOf('promote_price_week'), ap = priceOf('ad_price_week'); const today = todayIST();
+  let promos = [], ads = [], prods = [], tablesOk = true;
+  try {
+    [promos, ads, prods] = await Promise.all([sb.from('promo_requests').select('*').eq('shop_id', sh.id).order('id', { ascending: false }).limit(10), sb.from('ads').select('*').eq('shop_id', sh.id).order('id', { ascending: false }).limit(30), sb.from('products').select('id,name').eq('shop_id', sh.id).eq('active', true).order('name')]).then(r => r.map(must));
+  } catch (e) { tablesOk = false; }
+  const weeksOpts = (price, sel) => [1, 2, 4, 8].map(w => html`<option value="${w}">${w} week${w > 1 ? 's' : ''} — ${inr(price * w)}</option>`);
+  dashLayout('/promote', html`<h1>Promote & Ads</h1>
+  <p class="muted">Nothing is charged by the website. You pay the marketplace by UPI or Razorpay, and the team switches it on after they see your money.</p>
+  ${!tablesOk ? html`<div class="flash error">Promotions are not set up yet. The administrator must run the latest <code>supabase.sql</code>.</div>` : html`
+  <div class="panel"><h2>⭐ Promote my shop</h2><p>Promoted shops are shown <b>first</b> in town and category lists and in “Featured shops” on the home page.</p>
+    ${isFeatured(sh) ? html`<p><span class="tag gold">★ Promoted</span> until <b>${sh.featured_until}</b></p>` : ''}
+    ${pp ? html`<form class="row" data-form="promocreate"><select name="weeks" style="max-width:260px">${weeksOpts(pp)}</select><button class="btn gold" type="submit">Continue to payment</button></form>`
+        : html`<p class="notice">Promotion rates have not been published yet. <a href="#/contact">Ask the team</a>.</p>`}
+    ${promos.filter(r => r.status === 'open').map(r => html`<div class="panel" style="margin-top:12px"><b>${r.weeks} week${r.weeks > 1 ? 's' : ''} promotion — ${inr(r.amount)}</b> <span class="tag gold">waiting</span>
+      ${r.pay_ref ? claimView(r) : html`${payOptions({ amount: r.amount, note: `${siteName()} promote - ${sh.name}`, type: 'promo', id: r.id }) || html`<p class="small muted">Online payment is not switched on yet. Please contact the team.</p>`}`}</div>`)}
+    ${promos.filter(r => r.status !== 'open').length ? html`<p class="small muted">Earlier: ${promos.filter(r => r.status !== 'open').map(r => `${r.weeks}w ${r.status} (${dOnly(r.created_at)})`).join(' · ')}</p>` : ''}</div>
+  <div class="panel"><h2>📣 Banner advertisement</h2><p>Your banner appears between the products on the <b>home page</b> and category pages, marked “${adLabel()}”. The team checks every banner before it goes live.</p>
+    ${ap ? html`<form data-form="adcreate" novalidate>${field('Headline (3–80 letters)', 'title', '', 'type="text" required maxlength="80"')}${field('Short text (optional)', 'body', '', 'type="text" maxlength="160"')}
+      <label for="f_product_id">Open this when tapped</label><select id="f_product_id" name="product_id"><option value="">My shop page</option>${prods.map(p => html`<option value="${p.id}">${p.name}</option>`)}</select>
+      <label for="f_adimage">Banner picture (optional, landscape looks best)</label><img id="preview_ad" alt="" width="200" height="100" style="display:none;border-radius:12px;margin-bottom:8px;object-fit:cover"><input id="f_adimage" type="file" name="image" accept="image/jpeg,image/png,image/webp" data-preview="preview_ad">
+      <label for="f_adweeks">How long</label><select id="f_adweeks" name="weeks">${weeksOpts(ap)}</select>
+      <button class="btn gold" style="margin-top:14px" type="submit">Continue to payment</button></form>` : html`<p class="notice">Advertising rates have not been published yet. <a href="#/contact">Ask the team</a>.</p>`}</div>
+  ${ads.length ? html`<h2>Your ads</h2>${ads.map(a => html`<div class="panel"><div class="row between"><b>${a.title}</b><span class="tag ${a.status === 'approved' ? '' : a.status === 'rejected' ? 'red' : 'gold'}">${a.status}</span></div>
+    <p class="small muted">${a.weeks} week${a.weeks > 1 ? 's' : ''} · ${inr(a.amount)}${a.status === 'approved' ? ` · runs ${a.starts_on} to ${a.ends_on}${a.ends_on < today ? ' (ended)' : ''}` : ''}</p>
+    ${imgUrl(a.image) ? html`<img src="${imgUrl(a.image)}" alt="" width="200" height="100" style="border-radius:12px;object-fit:cover">` : ''}${a.admin_note ? html`<p class="notice"><b>Team note:</b> ${a.admin_note}</p>` : ''}
+    ${a.status === 'pending' ? (a.pay_ref ? claimView(a) : payOptions({ amount: a.amount, note: `${siteName()} ad - ${sh.name}`, type: 'ad', id: a.id }) || html`<p class="small muted">Online payment is not switched on yet. Please contact the team.</p>`) : ''}
+    ${a.status === 'pending' ? html`<button class="btn danger small" style="margin-top:8px" type="button" data-act="delad" data-id="${a.id}">Delete this ad</button>` : ''}</div>`)}` : ''}`}`, 'Promote');
+  renderQRs();
+});
 
 route('/dashboard/support', async () => {
   if (!ownerGuard()) return; const tickets = must(await sb.from('tickets').select('*').eq('shop_id', S.shop.id).order('id', { ascending: false }));
@@ -836,7 +900,7 @@ function adminGuard() {
 }
 function adminLayout(active, inner, title) {
   const l = (p, label) => html`<a class="${active === p ? 'on' : ''}" href="#/admin${p}">${label}</a>`;
-  view(html`<div class="wrap"><div class="dash"><nav class="side" aria-label="Admin">${l('', '📊 Overview')}${l('/shops', '🏪 Shops')}${l('/products', '📦 Products')}${l('/orders', '🧾 Orders')}${l('/customers', '👥 Customers')}${l('/owners', '🔑 Shop owners')}${l('/categories', '🗂️ Categories')}${l('/plans', '⭐ Plans')}${l('/payments', '💰 Payments')}${l('/commissions', '📑 Commissions')}${l('/tickets', '💬 Complaints')}${l('/settings', '⚙️ Settings')}<a href="#/dashboard/password">🔒 Password</a></nav><div>${inner}</div></div></div>`,
+  view(html`<div class="wrap"><div class="dash"><nav class="side" aria-label="Admin">${l('', '📊 Overview')}${l('/shops', '🏪 Shops')}${l('/products', '📦 Products')}${l('/orders', '🧾 Orders')}${l('/customers', '👥 Customers')}${l('/owners', '🔑 Shop owners')}${l('/categories', '🗂️ Categories')}${l('/plans', '⭐ Plans')}${l('/promotions', '📣 Ads & promotions')}${l('/payments', '💰 Payments')}${l('/commissions', '📑 Commissions')}${l('/tickets', '💬 Complaints')}${l('/settings', '⚙️ Settings')}<a href="#/dashboard/password">🔒 Password</a></nav><div>${inner}</div></div></div>`,
     { title: `${title || 'Admin'} | ${siteName()}`, noindex: true });
 }
 const one = x => (Array.isArray(x) ? x[0] : x) || {};
@@ -844,11 +908,13 @@ const shopTag = s => html`<span class="tag ${s === 'pending' ? 'gold' : (s === '
 
 route('/admin', async () => {
   if (!adminGuard()) return;
-  const [st, pending] = await Promise.all([sb.rpc('admin_stats'), sb.from('shops').select('*, profiles(phone,full_name)').eq('status', 'pending').order('id')]);
+  const [st, pending, pendAds, openPromos] = await Promise.all([sb.rpc('admin_stats'), sb.from('shops').select('*, profiles(phone,full_name)').eq('status', 'pending').order('id'),
+    sb.from('ads').select('id', { count: 'exact', head: true }).eq('status', 'pending').then(r => r.count || 0, () => 0), sb.from('promo_requests').select('id', { count: 'exact', head: true }).eq('status', 'open').then(r => r.count || 0, () => 0)]);
   const s = must(st); const pend = must(pending); const card = (n, l) => html`<div class="stat"><b>${n}</b><span>${l}</span></div>`;
   adminLayout('', html`<h1>Overview</h1><p class="muted small">All figures are real totals from the database. “Revenue” is the sum of payments you recorded as received (subscriptions, featured listings, ads, commission). The website itself does not collect money.</p>
   <div class="stats">${card(s.shops_total, 'Registered shops')}${card(s.shops_live, 'Live shops')}${card(s.shops_pending, 'Waiting approval')}${card(s.shops_suspended, 'Suspended')}${card(s.orders, 'Total orders')}${card(s.orders_30, 'Orders, last 30 days')}${card(s.customers, 'Customers (unique phones)')}${card(s.products, 'Products listed')}
     ${card(inr(s.gmv), 'Delivered order value')}${card(inr(s.revenue), 'Platform revenue recorded')}${card(inr(s.revenue_30), 'Revenue, last 30 days')}${card(inr(s.commission_earned), 'Commission earned (delivered)')}${card(s.tickets_open, 'Open complaints')}${card(s.plan_requests, 'Plan requests')}</div>
+  ${pendAds + openPromos ? html`<div class="notice"><b>${pendAds}</b> ad(s) and <b>${openPromos}</b> promotion request(s) waiting. <a href="#/admin/promotions">Open →</a></div>` : ''}
   <div class="panel"><h2>Shops waiting for approval</h2>${pend.length ? html`<div class="tablewrap"><table class="t"><tr><th>Shop</th><th>Place</th><th>Owner phone</th><th>Registered</th><th></th></tr>${pend.map(x => html`<tr><td><b>${x.name}</b></td><td>${x.town} ${x.pincode}</td><td>${one(x.profiles).phone || ''}</td><td>${dOnly(x.created_at)}</td><td><a class="btn small" href="#/admin/shop/${x.id}">Review</a></td></tr>`)}</table></div>` : emptyBox('No shops waiting.')}</div>`, 'Overview');
 });
 
@@ -940,6 +1006,30 @@ route('/admin/plans', async () => {
     ${field('Description', 'description', p.description, 'maxlength="300"')}${checkbox('Offered to shops', 'active', p.active)}<button class="btn small" type="submit">Save</button></form>`)}`, 'Plans');
 });
 
+route('/admin/promotions', async () => {
+  if (!adminGuard()) return; const today = todayIST();
+  const [ads, promos] = await Promise.all([sb.from('ads').select('*, shops(name,slug,town)').order('id', { ascending: false }).limit(100), sb.from('promo_requests').select('*, shops(name,featured_until)').order('id', { ascending: false }).limit(60)]);
+  const A = must(ads), P = must(promos); const claim = r => r.pay_ref ? html`<b>${r.pay_method.toUpperCase()}</b> ${inr(r.amount)} · ref <b>${r.pay_ref}</b>` : html`<span class="muted">no payment reported</span>`;
+  const warn = html`<p class="hint"><u>Check the payment in your bank / Razorpay dashboard first.</u> A reference typed by a shop is only a claim.</p>`;
+  adminLayout('/promotions', html`<h1>Ads & promotions</h1>
+  <h2>Promotion requests (featured shops)</h2>
+  ${P.filter(r => r.status === 'open').length ? P.filter(r => r.status === 'open').map(r => { const base = r.shops.featured_until && r.shops.featured_until > today ? r.shops.featured_until : today; return html`<form class="panel" data-form="promoact" data-id="${r.id}" data-shop="${r.shop_id}" data-weeks="${r.weeks}" data-base="${base}" data-amount="${r.amount}" data-ref="${r.pay_ref}">
+    <b><a href="#/admin/shop/${r.shop_id}">${r.shops.name}</a></b> — ${r.weeks} week${r.weeks > 1 ? 's' : ''}, ${inr(r.amount)} · ${dOnly(r.created_at)}<br>${claim(r)}${warn}
+    <p class="small">If activated, the shop is promoted until <b>${addDays(base, r.weeks * 7)}</b>.</p>${r.pay_ref ? checkbox('Also record ' + inr(r.amount) + ' in Payments', 'rec', true) : ''}
+    <div class="row"><button class="btn small" type="submit" name="action" value="activate">✅ Activate</button><button class="btn danger small" type="submit" name="action" value="dismiss">Dismiss</button></div></form>`; }) : emptyBox('No open promotion requests.')}
+  <h2 style="margin-top:24px">Banner ads</h2>
+  ${A.length ? A.map(a => html`<form class="panel" data-form="adreview" data-id="${a.id}" data-shop="${a.shop_id}" data-amount="${a.amount}" data-ref="${a.pay_ref}" data-status="${a.status}">
+    <div class="row between"><b>${a.title}</b><span class="tag ${a.status === 'approved' ? '' : a.status === 'pending' ? 'gold' : 'red'}">${a.status}</span></div>
+    <p class="small muted"><a href="#/admin/shop/${a.shop_id}">${one(a.shops).name}</a> · ${a.weeks} week${a.weeks > 1 ? 's' : ''} · ${inr(a.amount)} · ${dOnly(a.created_at)}<br>${a.body}</p>
+    ${imgUrl(a.image) ? html`<img src="${imgUrl(a.image)}" alt="" width="240" height="120" style="border-radius:12px;object-fit:cover">` : ''}<p>${claim(a)}</p>${a.status === 'pending' ? warn : ''}
+    <div class="grid2"><div><label>Starts</label><input type="date" name="starts_on" value="${a.starts_on || today}"></div><div><label>Ends</label><input type="date" name="ends_on" value="${a.ends_on || addDays(today, a.weeks * 7)}"></div></div>
+    <label>Note to the shop (shown if rejected)</label><input name="admin_note" value="${a.admin_note}" maxlength="300">
+    ${a.status === 'pending' && a.pay_ref ? checkbox('When approving, also record ' + inr(a.amount) + ' in Payments', 'rec', true) : ''}
+    <div class="row" style="margin-top:10px">${a.status !== 'approved' ? html`<button class="btn small" type="submit" name="action" value="approved">✅ Approve</button>` : html`<button class="btn small" type="submit" name="action" value="approved">Save dates</button>`}
+      ${a.status === 'approved' ? html`<button class="btn ghost small" type="submit" name="action" value="paused">Pause</button>` : ''}${a.status !== 'rejected' ? html`<button class="btn danger small" type="submit" name="action" value="rejected">Reject</button>` : ''}
+      <button class="btn danger small" type="button" data-act="adremove" data-id="${a.id}">Delete</button></div></form>`) : emptyBox('No ads yet.')}`, 'Ads');
+});
+
 route('/admin/payments', async () => {
   if (!adminGuard()) return; const rows = must(await sb.from('payments').select('*, shops(name)').order('id', { ascending: false }).limit(500)); const totals = {};
   rows.forEach(r => { totals[r.kind] = totals[r.kind] || { amount: 0, n: 0 }; totals[r.kind].amount += r.amount; totals[r.kind].n++; });
@@ -976,6 +1066,7 @@ route('/admin/settings', async () => {
   ${field('Order commission (% of item value on delivered orders, 0 = none)', 'commission_pct', setting('commission_pct'), 'type="number" min="0" max="30" step="0.1"')}<p class="hint">Applies only to new orders. Shown to shop owners on the Plans & charges page. Commission is recorded, not collected by the website.</p>
   <h2 style="margin-top:22px">Receive payments from shops</h2>
   <div class="grid2"><div>${field('Your UPI ID (e.g. name@bank)', 'upi_id', setting('upi_id'), 'maxlength="60" autocomplete="off"')}</div><div>${field('Name shown in the UPI app', 'upi_name', setting('upi_name'), 'maxlength="40"')}</div>
+    <div>${field('Promote shop: price per week (₹)', 'promote_price_week', setting('promote_price_week'), 'type="number" min="0" inputmode="numeric"')}</div><div>${field('Banner ad: price per week (₹)', 'ad_price_week', setting('ad_price_week'), 'type="number" min="0" inputmode="numeric"')}</div>
     <div>${field('Razorpay Key ID (starts with rzp_)', 'razorpay_key_id', setting('razorpay_key_id'), 'maxlength="60" autocomplete="off" placeholder="rzp_live_..."')}</div></div>
   <p class="hint">Shops then see “Pay by UPI” and “Pay with Razorpay” on their Subscription page. Paste only the Razorpay <b>Key ID</b>, never the Key Secret. Plans are activated by you after you see the money in your bank / Razorpay dashboard; the website does not verify payments automatically. Leave a box empty to hide that option.</p>
   <h2 style="margin-top:22px">Business & contact details (shown on policy and contact pages)</h2>${field('Operator / business name', 'operator_name', setting('operator_name'), 'maxlength="120"')}
@@ -1011,8 +1102,8 @@ const actions = {
   async togglestock(el) { must(await sb.from('products').update({ in_stock: el.dataset.val !== '1' }).eq('id', el.dataset.id).eq('shop_id', S.shop.id)); router(true); },
   async delproduct(el) {
     if (!confirm(`Delete ${el.dataset.name}? This cannot be undone.`)) return;
-    const p = must(await sb.from('products').select('image').eq('id', el.dataset.id).eq('shop_id', S.shop.id).maybeSingle());
-    must(await sb.from('products').delete().eq('id', el.dataset.id).eq('shop_id', S.shop.id)); if (p) removeImage(p.image); toast('Product deleted.'); router(true);
+    const p = must(await sb.from('products').select('image,image2,image3').eq('id', el.dataset.id).eq('shop_id', S.shop.id).maybeSingle());
+    must(await sb.from('products').delete().eq('id', el.dataset.id).eq('shop_id', S.shop.id)); if (p) [p.image, p.image2, p.image3].forEach(removeImage); toast('Product deleted.'); router(true);
   },
   async planrequest(el) {
     if (!confirm(`Send a request to the marketplace team to start ${el.dataset.name}? You are not charged by the website.`)) return;
@@ -1022,12 +1113,23 @@ const actions = {
     toast('Request sent. The team will contact you on WhatsApp with payment details. Your plan changes only after they confirm your payment.'); router(true);
   },
   async razorpay(el) {
-    const p = S.plans.find(x => String(x.id) === el.dataset.id), key = setting('razorpay_key_id'); if (!p || !key) return;
-    await loadRazorpay();
-    const rzp = new window.Razorpay({ key, amount: p.price * 100, currency: 'INR', name: siteName(), description: p.name + ' plan - 1 month', prefill: { name: S.shop.owner_name, email: S.user.email, contact: S.profile.phone || S.shop.whatsapp },
-      notes: { shop_id: String(S.shop.id), plan_id: String(p.id) }, theme: { color: '#0f6b3e' },
-      handler: r => { claimPlan(p.id, 'razorpay', r.razorpay_payment_id, p.price).then(() => { toast('Payment received by Razorpay (' + r.razorpay_payment_id + '). The team will confirm it and activate your plan.'); router(true); }).catch(e => toast('Paid, but saving failed: ' + e.message + '. Please contact support with payment ID ' + r.razorpay_payment_id, 'error')); } });
+    const key = setting('razorpay_key_id'); const type = el.dataset.type || 'plan'; let amount = Number(el.dataset.amount) || 0, desc = 'Payment';
+    if (type === 'plan') { const p = S.plans.find(x => String(x.id) === el.dataset.id); if (!p) return; amount = p.price; desc = p.name + ' plan - 1 month'; } else desc = type === 'ad' ? 'Banner advertisement' : 'Shop promotion';
+    if (!key || amount < 1) return; await loadRazorpay();
+    const rzp = new window.Razorpay({ key, amount: amount * 100, currency: 'INR', name: siteName(), description: desc, prefill: { name: S.shop.owner_name, email: S.user.email, contact: S.profile.phone || S.shop.whatsapp },
+      notes: { shop_id: String(S.shop.id), type, ref_id: String(el.dataset.id) }, theme: { color: '#0f6b3e' },
+      handler: r => { claimPay(type, el.dataset.id, 'razorpay', r.razorpay_payment_id, amount).then(() => { toast('Payment received by Razorpay (' + r.razorpay_payment_id + '). The team will confirm it and activate it.'); router(true); }).catch(e => toast('Paid, but saving failed: ' + e.message + ' Payment ID: ' + r.razorpay_payment_id, 'error')); } });
     rzp.on('payment.failed', r => toast('Payment failed: ' + ((r.error && r.error.description) || 'please try again'), 'error')); rzp.open();
+  },
+  async delad(el) {
+    if (!confirm('Delete this ad request?')) return;
+    const a = must(await sb.from('ads').select('image').eq('id', el.dataset.id).eq('shop_id', S.shop.id).maybeSingle());
+    must(await sb.from('ads').delete().eq('id', el.dataset.id).eq('shop_id', S.shop.id)); if (a) removeImage(a.image); router(true);
+  },
+  gal(el) { const m = document.getElementById('mainimg'); if (m) m.src = el.dataset.src; },
+  async adremove(el) {
+    if (!confirm('Delete this ad permanently?')) return; const a = must(await sb.from('ads').select('image').eq('id', el.dataset.id).maybeSingle());
+    must(await sb.from('ads').delete().eq('id', el.dataset.id)); if (a) removeImage(a.image); router(true);
   },
   async blockproduct(el) { must(await sb.from('products').update({ blocked: el.dataset.val !== '1' }).eq('id', el.dataset.id)); router(true); },
   async dismissreq(el) { must(await sb.from('plan_requests').update({ status: 'dismissed' }).eq('id', el.dataset.id)); router(true); },
@@ -1079,9 +1181,22 @@ const forms = {
     const res = must(await sb.rpc('place_order', { p_shop: cart.shopId, p_items: items, p_name: name, p_phone: phone, p_address: address, p_notes: cleanML(fd.get('notes'), 500), p_fulfilment: mode, p_channel: channel }));
     ls.set('nk_customer', { name, phone, address }); cartSet({ shopId: null, items: {} }); location.hash = `#/order/${res.code}?placed=1`;
   },
+  async promocreate(f, fd) {
+    const w = toInt(fd.get('weeks'), 1, 12), pp = priceOf('promote_price_week'); if (!w || !pp) throw new Error('Promotion is not available right now.');
+    must(await sb.from('promo_requests').insert({ shop_id: S.shop.id, weeks: w, amount: pp * w })); toast('Request created. Now pay using one of the options below.'); router(true);
+  },
+  async adcreate(f, fd) {
+    const w = toInt(fd.get('weeks'), 1, 12), ap = priceOf('ad_price_week'), title = clean(fd.get('title'), 80); if (!w || !ap) throw new Error('Advertising is not available right now.');
+    if (title.length < 3) throw new Error('Please write a headline (at least 3 letters).');
+    const file = fd.get('image'); const img = file && file.size ? await uploadImage(file, 1200) : null;
+    try { must(await sb.from('ads').insert({ shop_id: S.shop.id, title, body: clean(fd.get('body'), 160), image: img, product_id: toInt(fd.get('product_id'), 1), weeks: w, amount: ap * w })); }
+    catch (e) { if (img) removeImage(img); throw e; }
+    toast('Ad saved. Now pay using one of the options below. It goes live after the team checks it.'); router(true);
+  },
   async upiclaim(f, fd) {
-    const ref = clean(fd.get('ref'), 40); const p = S.plans.find(x => String(x.id) === f.dataset.id); if (!p || ref.length < 6) throw new Error('Enter the UPI reference / UTR number from your payment app.');
-    await claimPlan(p.id, 'upi', ref, p.price); toast('Thank you. The team will match your UPI payment and activate the plan.'); router(true);
+    const ref = clean(fd.get('ref'), 40); const type = f.dataset.type || 'plan'; if (ref.length < 6) throw new Error('Enter the UPI reference / UTR number from your payment app.');
+    let amount = Number(f.dataset.amount) || 0; if (type === 'plan') { const p = S.plans.find(x => String(x.id) === f.dataset.id); if (!p) return; amount = p.price; }
+    await claimPay(type, f.dataset.id, 'upi', ref, amount); toast('Thank you. The team will match your UPI payment and activate it.'); router(true);
   },
   async ticket(f, fd) {
     const name = clean(fd.get('name'), 80), phone = normPhone(fd.get('phone')), subject = clean(fd.get('subject'), 120), message = cleanML(fd.get('message'), 2000);
@@ -1120,13 +1235,20 @@ const forms = {
     const name = clean(fd.get('name'), 120); if (name.length < 2) throw new Error('Please enter the product name.'); if (price === null) throw new Error('Please enter a valid price in rupees.');
     if (dRaw && (disc === null || disc >= price)) throw new Error('Discount price must be less than the normal price.'); if (qRaw && qty === null) throw new Error('Stock quantity must be a whole number (or leave empty).');
     const row = { name, name_ml: clean(fd.get('name_ml'), 120), description: cleanML(fd.get('description'), 1000), category_id: toInt(fd.get('category_id'), 1), price, discount_price: disc, unit: clean(fd.get('unit'), 30), stock_qty: qty, in_stock: !!fd.get('in_stock') && qty !== 0, active: !!fd.get('active') };
-    const file = fd.get('image'); const id = f.dataset.id; let old = null;
-    const newImg = file && file.size ? await uploadImage(file, 1400) : null;
+    const id = f.dataset.id; const slots = ['image', 'image2', 'image3']; let old = { image: null, image2: null, image3: null };
+    if (id) old = must(await sb.from('products').select('image,image2,image3').eq('id', id).eq('shop_id', sh.id).maybeSingle()) || old;
+    const uploaded = [], finalList = [];
     try {
-      if (newImg) row.image = newImg;
-      if (id) { old = must(await sb.from('products').select('image').eq('id', id).eq('shop_id', sh.id).maybeSingle()); must(await sb.from('products').update(row).eq('id', id).eq('shop_id', sh.id)); if (newImg && old) removeImage(old.image); toast('Product updated.'); }
+      for (const k of slots) {
+        const file = fd.get(k); let url = old[k] || null;
+        if (file && file.size) { url = await uploadImage(file, 1400); uploaded.push(url); } else if (fd.get('rm_' + k)) url = null;
+        if (url) finalList.push(url);
+      }
+      row.image = finalList[0] || null; row.image2 = finalList[1] || null; row.image3 = finalList[2] || null;
+      if (id) { must(await sb.from('products').update(row).eq('id', id).eq('shop_id', sh.id)); toast('Product updated.'); }
       else { must(await sb.from('products').insert(Object.assign({ shop_id: sh.id }, row))); toast('Product added.'); }
-    } catch (e) { if (newImg) removeImage(newImg); throw e; }
+    } catch (e) { uploaded.forEach(removeImage); throw e; }
+    Object.values(old).forEach(u => { if (u && !finalList.includes(u)) removeImage(u); });
     location.hash = '#/dashboard/products';
   },
   async orderstatus(f, fd) { must(await sb.from('orders').update({ status: fd.get('status') }).eq('id', f.dataset.id).eq('shop_id', S.shop.id)); toast('Order status updated.'); router(true); },
@@ -1161,6 +1283,21 @@ const forms = {
     const amount = toInt(fd.get('amount'), 1, 10000000); if (!amount) throw new Error('Enter a valid amount and type.');
     must(await sb.from('payments').insert({ shop_id: Number(f.dataset.id), kind: fd.get('kind'), amount, reference: clean(fd.get('reference'), 80), note: clean(fd.get('note'), 200) })); toast('Payment recorded.'); router(true);
   },
+  async promoact(f, fd, ev) {
+    const action = ev && ev.submitter ? ev.submitter.value : ''; const d = f.dataset;
+    if (action === 'dismiss') { must(await sb.from('promo_requests').update({ status: 'dismissed' }).eq('id', d.id)); toast('Dismissed.'); return router(true); }
+    if (action !== 'activate') return; const until = addDays(d.base, Number(d.weeks) * 7);
+    must(await sb.from('shops').update({ featured_until: until }).eq('id', d.shop)); must(await sb.from('promo_requests').update({ status: 'done' }).eq('id', d.id));
+    if (fd.get('rec')) must(await sb.from('payments').insert({ shop_id: Number(d.shop), kind: 'featured', amount: Number(d.amount), reference: d.ref, note: 'Promotion ' + d.weeks + ' week(s)' }));
+    toast('Shop promoted until ' + until + '.'); router(true);
+  },
+  async adreview(f, fd, ev) {
+    const action = ev && ev.submitter ? ev.submitter.value : ''; const d = f.dataset; if (!['approved', 'rejected', 'paused'].includes(action)) return;
+    const s = clean(fd.get('starts_on'), 10), e = clean(fd.get('ends_on'), 10); if (action === 'approved' && (!/^\d{4}-\d\d-\d\d$/.test(s) || !/^\d{4}-\d\d-\d\d$/.test(e) || e < s)) throw new Error('Choose valid start and end dates (end after start).');
+    must(await sb.from('ads').update({ status: action, starts_on: s || null, ends_on: e || null, admin_note: clean(fd.get('admin_note'), 300) }).eq('id', d.id));
+    if (action === 'approved' && d.status === 'pending' && fd.get('rec')) must(await sb.from('payments').insert({ shop_id: Number(d.shop), kind: 'advert', amount: Number(d.amount), reference: d.ref, note: 'Banner ad' }));
+    toast('Ad ' + action + '.'); router(true);
+  },
   async catadd(f, fd) {
     const en = clean(fd.get('name_en'), 40); if (en.length < 2) throw new Error('Enter an English name.'); const slug = en.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'cat-' + Date.now();
     must(await sb.from('categories').insert({ slug, name_en: en, name_ml: clean(fd.get('name_ml'), 40) || en, icon: clean(fd.get('icon'), 4) || '🛍️', sort: toInt(fd.get('sort'), 0, 999) ?? 100 })); await loadBase(); toast('Category added.'); router(true);
@@ -1180,7 +1317,7 @@ const forms = {
     const upi = clean(fd.get('upi_id'), 60), rzk = clean(fd.get('razorpay_key_id'), 60);
     if (upi && !/^[\w.\-]{2,}@[A-Za-z]{2,}$/.test(upi)) throw new Error('UPI ID looks wrong. It should look like name@bank.'); if (rzk && !/^rzp_(test|live)_[A-Za-z0-9]+$/.test(rzk)) throw new Error('Razorpay Key ID should start with rzp_live_ or rzp_test_. Never paste the Key Secret.');
     const wa = String(fd.get('contact_whatsapp') || '').trim(); const rows = [['site_name', clean(fd.get('site_name'), 40) || 'Nammude Kada'], ['commission_pct', String(pct)], ['contact_email', clean(fd.get('contact_email'), 120)], ['contact_phone', clean(fd.get('contact_phone'), 20)], ['contact_whatsapp', wa ? (normPhone(wa) || '') : ''],
-      ['upi_id', upi], ['upi_name', clean(fd.get('upi_name'), 40)], ['razorpay_key_id', rzk], ['contact_address', cleanML(fd.get('contact_address'), 300)], ['operator_name', clean(fd.get('operator_name'), 120)], ['featured_price_note', cleanML(fd.get('featured_price_note'), 400)], ['ad_note', cleanML(fd.get('ad_note'), 400)]];
+      ['promote_price_week', String(toInt(fd.get('promote_price_week') || 0, 0, 100000) || '')], ['ad_price_week', String(toInt(fd.get('ad_price_week') || 0, 0, 100000) || '')], ['upi_id', upi], ['upi_name', clean(fd.get('upi_name'), 40)], ['razorpay_key_id', rzk], ['contact_address', cleanML(fd.get('contact_address'), 300)], ['operator_name', clean(fd.get('operator_name'), 120)], ['featured_price_note', cleanML(fd.get('featured_price_note'), 400)], ['ad_note', cleanML(fd.get('ad_note'), 400)]];
     must(await sb.from('settings').upsert(rows.map(([key, value]) => ({ key, value })), { onConflict: 'key' })); await loadBase(); renderChrome(); toast('Settings saved.');
   },
 };
