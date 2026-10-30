@@ -17,7 +17,7 @@ const STATUSES = ['new', 'confirmed', 'preparing', 'ready', 'out_for_delivery', 
 const DISTRICTS = ['Thiruvananthapuram', 'Kollam', 'Pathanamthitta', 'Alappuzha', 'Kottayam', 'Idukki', 'Ernakulam', 'Thrissur', 'Palakkad', 'Malappuram', 'Kozhikode', 'Wayanad', 'Kannur', 'Kasaragod'];
 const PER_PAGE = 24;
 const ADMIN_ONLY = !!window.NK_ADMIN_ONLY; // set by admin.html
-const I18N = {"home": {"en": "Home", "ml": "ഹോം"}, "shops": {"en": "Shops", "ml": "കടകൾ"}, "categories": {"en": "Categories", "ml": "വിഭാഗങ്ങൾ"}, "all": {"en": "All", "ml": "എല്ലാം"}, "search": {"en": "Search", "ml": "തിരയുക"}, "search_ph": {"en": "Search products, shops, places…", "ml": "സാധനങ്ങൾ, കടകൾ, സ്ഥലങ്ങൾ തിരയുക…"}, "cart": {"en": "Cart", "ml": "കാർട്ട്"}, "login": {"en": "Log in", "ml": "ലോഗിൻ"}, "logout": {"en": "Log out", "ml": "ലോഗൗട്ട്"}, "register_shop": {"en": "Sell with us", "ml": "നിങ്ങളുടെ കട ചേർക്കുക"}, "my_shop": {"en": "My shop", "ml": "എന്റെ കട"}, "admin": {"en": "Admin", "ml": "അഡ്മിൻ"}, "tagline": {"en": "Buy from shops in your own town", "ml": "നിങ്ങളുടെ നാട്ടിലെ കടകളിൽ നിന്ന് വാങ്ങൂ"}, "hero_title": {"en": "Your town's shops, now online", "ml": "നിങ്ങളുടെ നാട്ടിലെ കടകൾ ഇനി ഓൺലൈനിൽ"}, "hero_sub": {"en": "Find nearby shops, pick your items, and order on WhatsApp or the website. Delivery or pickup — your choice.", "ml": "അടുത്തുള്ള കടകൾ കണ്ടെത്തൂ, സാധനങ്ങൾ തിരഞ്ഞെടുക്കൂ, വാട്സ്ആപ്പിലോ വെബ്സൈറ്റിലോ ഓർഡർ ചെയ്യൂ. ഡെലിവറിയോ പിക്കപ്പോ — നിങ്ങളുടെ ഇഷ്ടം."}, "your_place": {"en": "Your place", "ml": "നിങ്ങളുടെ സ്ഥലം"}, "town_ph": {"en": "Town / place", "ml": "ടൗൺ / സ്ഥലം"}, "pin_ph": {"en": "PIN code", "ml": "പിൻകോഡ്"}, "set_place": {"en": "Show shops here", "ml": "ഇവിടത്തെ കടകൾ കാണിക്കുക"}, "clear": {"en": "Clear", "ml": "മാറ്റുക"}, "showing_for": {"en": "Showing shops near", "ml": "ഇവിടത്തെ കടകൾ കാണിക്കുന്നു:"}, "featured_shops": {"en": "Featured shops", "ml": "തിരഞ്ഞെടുത്ത കടകൾ"}, "new_shops": {"en": "New on the marketplace", "ml": "പുതിയതായി ചേർന്ന കടകൾ"}, "popular_products": {"en": "Latest products", "ml": "പുതിയ സാധനങ്ങൾ"}, "offers": {"en": "Offers", "ml": "ഓഫറുകൾ"}, "no_shops_yet": {"en": "No shops here yet. Shop owners can register for free.", "ml": "ഇവിടെ ഇതുവരെ കടകളില്ല. കടയുടമകൾക്ക് സൗജന്യമായി ചേരാം."}, "no_products_yet": {"en": "No products yet.", "ml": "ഇതുവരെ സാധനങ്ങളില്ല."}, "no_results": {"en": "Nothing found. Try another word or place.", "ml": "ഒന്നും കണ്ടെത്തിയില്ല. മറ്റൊരു വാക്കോ സ്ഥലമോ നോക്കൂ."}, "view_shop": {"en": "View shop", "ml": "കട കാണുക"}, "view_all": {"en": "View all", "ml": "എല്ലാം കാണുക"}, "open_now": {"en": "Open now", "ml": "ഇപ്പോൾ തുറന്നിരിക്കുന്നു"}, "closed_now": {"en": "Closed now", "ml": "ഇപ്പോൾ അടച്ചിരിക്കുന്നു"}, "not_accepting": {"en": "Not taking orders right now", "ml": "ഇപ്പോൾ ഓർഡർ എടുക്കുന്നില്ല"}, "delivery": {"en": "Home delivery", "ml": "ഹോം ഡെലിവറി"}, "pickup": {"en": "Store pickup", "ml": "കടയിൽ നിന്ന് എടുക്കാം"}, "delivery_fee": {"en": "Delivery fee", "ml": "ഡെലിവറി ചാർജ്"}, "free": {"en": "Free", "ml": "സൗജന്യം"}, "min_order": {"en": "Minimum order", "ml": "കുറഞ്ഞ ഓർഡർ"}, "est_delivery": {"en": "Delivery time", "ml": "ഡെലിവറി സമയം"}, "opening_hours": {"en": "Opening hours", "ml": "തുറക്കുന്ന സമയം"}, "address": {"en": "Address", "ml": "വിലാസം"}, "map": {"en": "Open in Maps", "ml": "മാപ്പിൽ കാണുക"}, "whatsapp_shop": {"en": "WhatsApp the shop", "ml": "കടയിലേക്ക് വാട്സ്ആപ്പ്"}, "call_shop": {"en": "Call", "ml": "വിളിക്കുക"}, "add_to_cart": {"en": "Add to cart", "ml": "കാർട്ടിൽ ചേർക്കുക"}, "in_stock": {"en": "In stock", "ml": "സ്റ്റോക്കുണ്ട്"}, "out_of_stock": {"en": "Out of stock", "ml": "സ്റ്റോക്കില്ല"}, "sold_by": {"en": "Sold by", "ml": "വിൽക്കുന്നത്"}, "price": {"en": "Price", "ml": "വില"}, "qty": {"en": "Qty", "ml": "എണ്ണം"}, "remove": {"en": "Remove", "ml": "ഒഴിവാക്കുക"}, "update": {"en": "Update", "ml": "മാറ്റുക"}, "subtotal": {"en": "Items total", "ml": "സാധനങ്ങളുടെ വില"}, "total": {"en": "Total", "ml": "ആകെ"}, "cart_empty": {"en": "Your cart is empty.", "ml": "നിങ്ങളുടെ കാർട്ട് ഒഴിഞ്ഞതാണ്."}, "checkout": {"en": "Checkout", "ml": "ചെക്കൗട്ട്"}, "your_name": {"en": "Your name", "ml": "നിങ്ങളുടെ പേര്"}, "your_phone": {"en": "Mobile number", "ml": "മൊബൈൽ നമ്പർ"}, "delivery_address": {"en": "Delivery address", "ml": "ഡെലിവറി വിലാസം"}, "order_notes": {"en": "Notes for the shop (optional)", "ml": "കടയ്ക്കുള്ള കുറിപ്പ് (വേണമെങ്കിൽ)"}, "how_receive": {"en": "How do you want to receive it?", "ml": "എങ്ങനെ വാങ്ങണം?"}, "payment": {"en": "Payment", "ml": "പേയ്മെന്റ്"}, "cod": {"en": "Cash on delivery / pay at the shop", "ml": "സാധനം കിട്ടുമ്പോൾ / കടയിൽ പണം നൽകാം"}, "no_online_payment": {"en": "Online payment is not available. You pay the shop directly.", "ml": "ഓൺലൈൻ പേയ്മെന്റ് ഇല്ല. കടയിൽ നേരിട്ട് പണം നൽകാം."}, "place_order": {"en": "Place order on website", "ml": "വെബ്സൈറ്റിൽ ഓർഡർ ചെയ്യുക"}, "order_whatsapp": {"en": "Order on WhatsApp", "ml": "വാട്സ്ആപ്പിൽ ഓർഡർ ചെയ്യുക"}, "order_placed": {"en": "Order placed!", "ml": "ഓർഡർ ചെയ്തു!"}, "order_code": {"en": "Order number", "ml": "ഓർഡർ നമ്പർ"}, "track_order": {"en": "Track order", "ml": "ഓർഡർ നില അറിയുക"}, "status": {"en": "Status", "ml": "നില"}, "s_new": {"en": "New", "ml": "പുതിയത്"}, "s_confirmed": {"en": "Confirmed", "ml": "സ്ഥിരീകരിച്ചു"}, "s_preparing": {"en": "Preparing", "ml": "ഒരുക്കുന്നു"}, "s_ready": {"en": "Ready", "ml": "തയ്യാർ"}, "s_out_for_delivery": {"en": "Out for delivery", "ml": "ഡെലിവറിക്ക് പുറപ്പെട്ടു"}, "s_delivered": {"en": "Delivered", "ml": "എത്തിച്ചു"}, "s_cancelled": {"en": "Cancelled", "ml": "റദ്ദാക്കി"}, "language": {"en": "Language", "ml": "ഭാഷ"}, "privacy": {"en": "Privacy Policy", "ml": "സ്വകാര്യതാ നയം"}, "terms": {"en": "Terms & Conditions", "ml": "നിബന്ധനകൾ"}, "refund": {"en": "Cancellation & Refund", "ml": "റദ്ദാക്കലും റീഫണ്ടും"}, "contact": {"en": "Contact & Support", "ml": "ബന്ധപ്പെടുക"}, "pricing": {"en": "Plans & charges", "ml": "പ്ലാനുകളും ചാർജുകളും"}, "phone": {"en": "Phone", "ml": "ഫോൺ"}, "password": {"en": "Password", "ml": "പാസ്‌വേഡ്"}, "name": {"en": "Name", "ml": "പേര്"}, "save": {"en": "Save", "ml": "സേവ് ചെയ്യുക"}, "cancel": {"en": "Cancel", "ml": "വേണ്ട"}, "edit": {"en": "Edit", "ml": "തിരുത്തുക"}, "delete": {"en": "Delete", "ml": "ഒഴിവാക്കുക"}, "add_product": {"en": "Add product", "ml": "സാധനം ചേർക്കുക"}, "products": {"en": "Products", "ml": "സാധനങ്ങൾ"}, "orders": {"en": "Orders", "ml": "ഓർഡറുകൾ"}, "reports": {"en": "Reports", "ml": "റിപ്പോർട്ടുകൾ"}, "settings": {"en": "Shop settings", "ml": "കടയുടെ ക്രമീകരണം"}, "subscription": {"en": "Plan", "ml": "പ്ലാൻ"}, "support": {"en": "Support", "ml": "സഹായം"}, "send": {"en": "Send", "ml": "അയയ്ക്കുക"}, "demo_banner": {"en": "DEMO MODE — all shops, products and orders you see are sample test data.", "ml": "ഡെമോ മോഡ് — ഇവിടെ കാണുന്ന കടകളും സാധനങ്ങളും ഓർഡറുകളും പരീക്ഷണത്തിനുള്ള സാമ്പിൾ ഡാറ്റയാണ്."}, "install_app": {"en": "Install app", "ml": "ആപ്പ് ഇൻസ്റ്റാൾ ചെയ്യുക"}, "pending_notice": {"en": "Your shop is waiting for approval. It will go live after the admin approves it.", "ml": "നിങ്ങളുടെ കട അംഗീകാരത്തിനായി കാത്തിരിക്കുന്നു. അഡ്മിൻ അംഗീകരിച്ചാൽ കട പ്രവർത്തനക്ഷമമാകും."}, "footer_note": {"en": "Local shops, local people.", "ml": "നാട്ടിലെ കടകൾ, നാട്ടിലെ ആളുകൾ."}};
+const I18N = {"home": {"en": "Home", "ml": "ഹോം"}, "shops": {"en": "Shops", "ml": "കടകൾ"}, "categories": {"en": "Categories", "ml": "വിഭാഗങ്ങൾ"}, "all": {"en": "All", "ml": "എല്ലാം"}, "search": {"en": "Search", "ml": "തിരയുക"}, "search_ph": {"en": "Search products, shops, places…", "ml": "സാധനങ്ങൾ, കടകൾ, സ്ഥലങ്ങൾ തിരയുക…"}, "cart": {"en": "Cart", "ml": "കാർട്ട്"}, "login": {"en": "Log in", "ml": "ലോഗിൻ"}, "logout": {"en": "Log out", "ml": "ലോഗൗട്ട്"}, "register_shop": {"en": "Sell with us", "ml": "നിങ്ങളുടെ കട ചേർക്കുക"}, "my_shop": {"en": "My shop", "ml": "എന്റെ കട"}, "admin": {"en": "Admin", "ml": "അഡ്മിൻ"}, "tagline": {"en": "Buy from shops in your own town", "ml": "നിങ്ങളുടെ നാട്ടിലെ കടകളിൽ നിന്ന് വാങ്ങൂ"}, "hero_title": {"en": "Your town's shops, now online", "ml": "നിങ്ങളുടെ നാട്ടിലെ കടകൾ ഇനി ഓൺലൈനിൽ"}, "hero_sub": {"en": "Find nearby shops, pick your items, and order on WhatsApp or the website. Delivery or pickup — your choice.", "ml": "അടുത്തുള്ള കടകൾ കണ്ടെത്തൂ, സാധനങ്ങൾ തിരഞ്ഞെടുക്കൂ, വാട്സ്ആപ്പിലോ വെബ്സൈറ്റിലോ ഓർഡർ ചെയ്യൂ. ഡെലിവറിയോ പിക്കപ്പോ — നിങ്ങളുടെ ഇഷ്ടം."}, "your_place": {"en": "Your place", "ml": "നിങ്ങളുടെ സ്ഥലം"}, "town_ph": {"en": "Town / place", "ml": "ടൗൺ / സ്ഥലം"}, "pin_ph": {"en": "PIN code", "ml": "പിൻകോഡ്"}, "set_place": {"en": "Show shops here", "ml": "ഇവിടത്തെ കടകൾ കാണിക്കുക"}, "clear": {"en": "Clear", "ml": "മാറ്റുക"}, "showing_for": {"en": "Showing shops near", "ml": "ഇവിടത്തെ കടകൾ കാണിക്കുന്നു:"}, "featured_shops": {"en": "Featured shops", "ml": "തിരഞ്ഞെടുത്ത കടകൾ"}, "new_shops": {"en": "New on the marketplace", "ml": "പുതിയതായി ചേർന്ന കടകൾ"}, "popular_products": {"en": "Latest products", "ml": "പുതിയ സാധനങ്ങൾ"}, "offers": {"en": "Offers", "ml": "ഓഫറുകൾ"}, "no_shops_yet": {"en": "No shops here yet. Shop owners can register for free.", "ml": "ഇവിടെ ഇതുവരെ കടകളില്ല. കടയുടമകൾക്ക് സൗജന്യമായി ചേരാം."}, "no_products_yet": {"en": "No products yet.", "ml": "ഇതുവരെ സാധനങ്ങളില്ല."}, "no_results": {"en": "Nothing found. Try another word or place.", "ml": "ഒന്നും കണ്ടെത്തിയില്ല. മറ്റൊരു വാക്കോ സ്ഥലമോ നോക്കൂ."}, "view_shop": {"en": "View shop", "ml": "കട കാണുക"}, "view_all": {"en": "View all", "ml": "എല്ലാം കാണുക"}, "open_now": {"en": "Open now", "ml": "ഇപ്പോൾ തുറന്നിരിക്കുന്നു"}, "closed_now": {"en": "Closed now", "ml": "ഇപ്പോൾ അടച്ചിരിക്കുന്നു"}, "not_accepting": {"en": "Not taking orders right now", "ml": "ഇപ്പോൾ ഓർഡർ എടുക്കുന്നില്ല"}, "delivery": {"en": "Home delivery", "ml": "ഹോം ഡെലിവറി"}, "pickup": {"en": "Store pickup", "ml": "കടയിൽ നിന്ന് എടുക്കാം"}, "delivery_fee": {"en": "Delivery fee", "ml": "ഡെലിവറി ചാർജ്"}, "free": {"en": "Free", "ml": "സൗജന്യം"}, "min_order": {"en": "Minimum order", "ml": "കുറഞ്ഞ ഓർഡർ"}, "est_delivery": {"en": "Delivery time", "ml": "ഡെലിവറി സമയം"}, "opening_hours": {"en": "Opening hours", "ml": "തുറക്കുന്ന സമയം"}, "address": {"en": "Address", "ml": "വിലാസം"}, "map": {"en": "Open in Maps", "ml": "മാപ്പിൽ കാണുക"}, "whatsapp_shop": {"en": "WhatsApp the shop", "ml": "കടയിലേക്ക് വാട്സ്ആപ്പ്"}, "call_shop": {"en": "Call", "ml": "വിളിക്കുക"}, "add_to_cart": {"en": "Add to cart", "ml": "കാർട്ടിൽ ചേർക്കുക"}, "in_stock": {"en": "In stock", "ml": "സ്റ്റോക്കുണ്ട്"}, "out_of_stock": {"en": "Out of stock", "ml": "സ്റ്റോക്കില്ല"}, "sold_by": {"en": "Sold by", "ml": "വിൽക്കുന്നത്"}, "price": {"en": "Price", "ml": "വില"}, "qty": {"en": "Qty", "ml": "എണ്ണം"}, "remove": {"en": "Remove", "ml": "ഒഴിവാക്കുക"}, "update": {"en": "Update", "ml": "മാറ്റുക"}, "subtotal": {"en": "Items total", "ml": "സാധനങ്ങളുടെ വില"}, "total": {"en": "Total", "ml": "ആകെ"}, "cart_empty": {"en": "Your cart is empty.", "ml": "നിങ്ങളുടെ കാർട്ട് ഒഴിഞ്ഞതാണ്."}, "checkout": {"en": "Checkout", "ml": "ചെക്കൗട്ട്"}, "your_name": {"en": "Your name", "ml": "നിങ്ങളുടെ പേര്"}, "your_phone": {"en": "Mobile number", "ml": "മൊബൈൽ നമ്പർ"}, "delivery_address": {"en": "Delivery address", "ml": "ഡെലിവറി വിലാസം"}, "order_notes": {"en": "Notes for the shop (optional)", "ml": "കടയ്ക്കുള്ള കുറിപ്പ് (വേണമെങ്കിൽ)"}, "how_receive": {"en": "How do you want to receive it?", "ml": "എങ്ങനെ വാങ്ങണം?"}, "payment": {"en": "Payment", "ml": "പേയ്മെന്റ്"}, "cod": {"en": "Cash on delivery / pay at the shop", "ml": "സാധനം കിട്ടുമ്പോൾ / കടയിൽ പണം നൽകാം"}, "no_online_payment": {"en": "You pay the shop directly (cash, or UPI if the shop accepts it). This website does not collect your money.", "ml": "കടയിൽ നേരിട്ട് പണം നൽകാം (പണമായോ, കട UPI സ്വീകരിക്കുന്നുണ്ടെങ്കിൽ UPI വഴിയോ). ഈ വെബ്സൈറ്റ് നിങ്ങളുടെ പണം സ്വീകരിക്കുന്നില്ല."}, "place_order": {"en": "Place order on website", "ml": "വെബ്സൈറ്റിൽ ഓർഡർ ചെയ്യുക"}, "order_whatsapp": {"en": "Order on WhatsApp", "ml": "വാട്സ്ആപ്പിൽ ഓർഡർ ചെയ്യുക"}, "order_placed": {"en": "Order placed!", "ml": "ഓർഡർ ചെയ്തു!"}, "order_code": {"en": "Order number", "ml": "ഓർഡർ നമ്പർ"}, "track_order": {"en": "Track order", "ml": "ഓർഡർ നില അറിയുക"}, "status": {"en": "Status", "ml": "നില"}, "s_new": {"en": "New", "ml": "പുതിയത്"}, "s_confirmed": {"en": "Confirmed", "ml": "സ്ഥിരീകരിച്ചു"}, "s_preparing": {"en": "Preparing", "ml": "ഒരുക്കുന്നു"}, "s_ready": {"en": "Ready", "ml": "തയ്യാർ"}, "s_out_for_delivery": {"en": "Out for delivery", "ml": "ഡെലിവറിക്ക് പുറപ്പെട്ടു"}, "s_delivered": {"en": "Delivered", "ml": "എത്തിച്ചു"}, "s_cancelled": {"en": "Cancelled", "ml": "റദ്ദാക്കി"}, "language": {"en": "Language", "ml": "ഭാഷ"}, "privacy": {"en": "Privacy Policy", "ml": "സ്വകാര്യതാ നയം"}, "terms": {"en": "Terms & Conditions", "ml": "നിബന്ധനകൾ"}, "refund": {"en": "Cancellation & Refund", "ml": "റദ്ദാക്കലും റീഫണ്ടും"}, "contact": {"en": "Contact & Support", "ml": "ബന്ധപ്പെടുക"}, "pricing": {"en": "Plans & charges", "ml": "പ്ലാനുകളും ചാർജുകളും"}, "phone": {"en": "Phone", "ml": "ഫോൺ"}, "password": {"en": "Password", "ml": "പാസ്‌വേഡ്"}, "name": {"en": "Name", "ml": "പേര്"}, "save": {"en": "Save", "ml": "സേവ് ചെയ്യുക"}, "cancel": {"en": "Cancel", "ml": "വേണ്ട"}, "edit": {"en": "Edit", "ml": "തിരുത്തുക"}, "delete": {"en": "Delete", "ml": "ഒഴിവാക്കുക"}, "add_product": {"en": "Add product", "ml": "സാധനം ചേർക്കുക"}, "products": {"en": "Products", "ml": "സാധനങ്ങൾ"}, "orders": {"en": "Orders", "ml": "ഓർഡറുകൾ"}, "reports": {"en": "Reports", "ml": "റിപ്പോർട്ടുകൾ"}, "settings": {"en": "Shop settings", "ml": "കടയുടെ ക്രമീകരണം"}, "subscription": {"en": "Plan", "ml": "പ്ലാൻ"}, "support": {"en": "Support", "ml": "സഹായം"}, "send": {"en": "Send", "ml": "അയയ്ക്കുക"}, "demo_banner": {"en": "DEMO MODE — all shops, products and orders you see are sample test data.", "ml": "ഡെമോ മോഡ് — ഇവിടെ കാണുന്ന കടകളും സാധനങ്ങളും ഓർഡറുകളും പരീക്ഷണത്തിനുള്ള സാമ്പിൾ ഡാറ്റയാണ്."}, "install_app": {"en": "Install app", "ml": "ആപ്പ് ഇൻസ്റ്റാൾ ചെയ്യുക"}, "pending_notice": {"en": "Your shop is waiting for approval. It will go live after the admin approves it.", "ml": "നിങ്ങളുടെ കട അംഗീകാരത്തിനായി കാത്തിരിക്കുന്നു. അഡ്മിൻ അംഗീകരിച്ചാൽ കട പ്രവർത്തനക്ഷമമാകും."}, "footer_note": {"en": "Local shops, local people.", "ml": "നാട്ടിലെ കടകൾ, നാട്ടിലെ ആളുകൾ."}};
 
 /* ---------- tiny helpers ---------- */
 const $ = (s, r = document) => r.querySelector(s);
@@ -51,7 +51,10 @@ const S = {
   cats: [], plans: [], settings: {},
   user: null, profile: null, shop: null,
   timer: null, route: '',
+  app: false, installEvt: null,
 };
+const isStandalone = () => { try { return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true; } catch (e) { return false; } };
+S.app = !window.NK_ADMIN_ONLY && (ls.get('nk_app', null) === null ? isStandalone() : !!ls.get('nk_app', false));
 const t = k => (I18N[k] && (I18N[k][S.lang] || I18N[k].en)) || k;
 const setting = k => S.settings[k] || '';
 const siteName = () => setting('site_name') || 'Nammude Kada';
@@ -67,7 +70,10 @@ const priceOf = k => { const n = parseInt(setting(k), 10); return n > 0 ? n : 0;
 const isFeatured = s => !!(s.featured_until && s.featured_until >= todayIST());
 
 let sb = null;
-const configured = () => /^https:\/\/[a-z0-9-]+\.supabase\.(co|in)$/i.test(CONFIG.SUPABASE_URL) && !/YOUR/.test(CONFIG.SUPABASE_ANON_KEY) && CONFIG.SUPABASE_ANON_KEY.length > 40;
+CONFIG.SUPABASE_URL = String(CONFIG.SUPABASE_URL).trim().replace(/\/+$/, '').replace(/\/(rest|auth)\/v1.*$/, ''); CONFIG.SUPABASE_ANON_KEY = String(CONFIG.SUPABASE_ANON_KEY).trim();
+const urlOk = () => /^https:\/\/[a-z0-9-]+\.supabase\.(co|in)$/i.test(CONFIG.SUPABASE_URL) && !/YOUR/i.test(CONFIG.SUPABASE_URL);
+const keyOk = () => !/YOUR/i.test(CONFIG.SUPABASE_ANON_KEY) && CONFIG.SUPABASE_ANON_KEY.length > 40;
+const configured = () => urlOk() && keyOk();
 
 /* Supabase returns {data, error}. Turn errors into exceptions with a readable message. */
 function must(res) {
@@ -138,6 +144,21 @@ function renderChrome() {
     return;
   }
   const n = cartCount();
+  document.body.classList.toggle('appmode', S.app);
+  const installBtn = isStandalone() ? '' : html`<button class="linkbtn modebtn" data-act="install" type="button">⬇ ${S.lang === 'ml' ? 'ഇൻസ്റ്റാൾ' : 'Install'}</button>`;
+  const toggleBtn = html`${S.app ? installBtn : ''}<button class="linkbtn modebtn" data-act="appmode" type="button">${S.app ? '🌐 ' + (S.lang === 'ml' ? 'വെബ്സൈറ്റ്' : 'Website') : '📱 ' + (S.lang === 'ml' ? 'ആപ്പ് മോഡ്' : 'App mode')}</button>`;
+  const langBox = html`<span class="langbox"><a class="${S.lang === 'en' ? 'on' : ''}" href="#" data-act="lang" data-lang="en">EN</a><a class="${S.lang === 'ml' ? 'on' : ''}" href="#" data-act="lang" data-lang="ml">മലയാളം</a></span>`;
+  const hashNow = location.hash || '#/'; const pth = hashNow.slice(1).split('?')[0];
+  const tab = /^\/(shops|category|s\/)/.test(pth) ? 'shops' : /^\/search/.test(pth) ? 'search' : /^\/(cart|checkout)/.test(pth) ? 'cart' : /^\/(login|register|dashboard|reset)/.test(pth) ? 'acct' : (pth === '/' ? 'home' : '');
+  let tb = document.getElementById('tabbar'); if (!tb) { tb = document.createElement('nav'); tb.id = 'tabbar'; tb.className = 'tabbar'; tb.setAttribute('aria-label', 'App menu'); document.body.appendChild(tb); }
+  const tabItem = (id, href, ico, label, extra) => html`<a class="${tab === id ? 'on' : ''}" href="${href}"><span class="i" aria-hidden="true">${ico}</span>${label}${extra || ''}</a>`;
+  tb.innerHTML = S.app ? html`${tabItem('home', '#/', '🏠', t('home'))}${tabItem('shops', '#/shops', '🏪', t('shops'))}${tabItem('search', '#/search', '🔍', t('search'))}${tabItem('cart', '#/cart', '🛒', t('cart'), n ? html`<span class="badge">${n}</span>` : '')}${tabItem('acct', u ? (admin ? '#/' : '#/dashboard') : '#/login', '👤', S.lang === 'ml' ? 'അക്കൗണ്ട്' : 'Account')}`.s : '';
+  if (S.app) {
+    $('#top').innerHTML = html`<a class="brand" href="#/">🛍️ ${siteName()}</a><nav class="nav" aria-label="Main">${toggleBtn}${u ? html`<button class="linkbtn" data-act="logout" type="button">${t('logout')}</button>` : ''}${langBox}</nav>`.s;
+    $('#placebar').innerHTML = S.place && !/^#\/(dashboard|admin)/.test(hashNow) ? html`<div class="placebar"><div class="wrap row between"><span>📍 ${t('showing_for')} <b>${S.place}</b></span><button class="btn ghost small" data-act="clearplace" type="button">${t('clear')}</button></div></div>`.s : '';
+    $('#foot').innerHTML = ''; $('#stickycart').innerHTML = '';
+    return;
+  }
   $('#top').innerHTML = html`
     <a class="brand" href="#/">🛍️ ${siteName()}</a>
     <nav class="nav" aria-label="Main">
@@ -145,6 +166,7 @@ function renderChrome() {
       ${u ? (admin ? '' : html`<a href="#/dashboard">${t('my_shop')}</a>`)
           : html`<a href="#/register">${t('register_shop')}</a><a href="#/login">${t('login')}</a>`}
       ${u ? html`<button class="linkbtn" data-act="logout" type="button">${t('logout')}</button>` : ''}
+      ${toggleBtn}
       <a class="cartlink" href="#/cart">🛒 ${t('cart')}${n ? html`<span class="badge">${n}</span>` : ''}</a>
       <span class="langbox">
         <a class="${S.lang === 'en' ? 'on' : ''}" href="#" data-act="lang" data-lang="en">EN</a>
@@ -220,7 +242,8 @@ const range = (page, per = PER_PAGE) => [(page - 1) * per, page * per - 1];
 const field = (label, name, value = '', attrs = '') => html`<label for="f_${name}">${label}</label><input id="f_${name}" name="${name}" value="${value}" ${raw(attrs)}>`;
 const checkbox = (label, name, on) => html`<label class="check"><input type="checkbox" name="${name}" value="1" ${on ? raw('checked') : ''}> <span>${label}</span></label>`;
 const needsSetup = () => html`<div class="setup-card"><h1>One-time setup needed</h1>
-  <p>Open <code>app.js</code> and put your Supabase <b>Project URL</b> and <b>anon public key</b> at the top (<code>CONFIG</code>). Then run <code>supabase.sql</code> in the Supabase SQL Editor. See README.md.</p></div>`;
+  <p><b>Problem found:</b> ${!window.supabase ? 'the Supabase library could not be loaded (check your internet / ad-blocker, and that index.html still has the supabase-js <script> line).' : !urlOk() ? 'SUPABASE_URL in app.js is still the placeholder or looks wrong. It must look like https://abcdxyz.supabase.co' : 'SUPABASE_ANON_KEY in app.js is still the placeholder or too short.'}</p>
+  <p>Open <code>app.js</code> and put your Supabase <b>Project URL</b> and <b>anon public key</b> at the top (<code>CONFIG</code>), save it on GitHub, wait a minute and refresh. Then run <code>supabase.sql</code> in the Supabase SQL Editor. See README.md.</p></div>`;
 
 /* ---------- queries ---------- */
 const SHOP_SEL = '*, categories(name_en,name_ml,icon,slug)';
@@ -478,7 +501,7 @@ route('/checkout', async () => {
     ${field(t('your_phone'), 'phone', saved.phone || '', 'type="tel" required inputmode="numeric" maxlength="15" autocomplete="tel" placeholder="98XXXXXXXX"')}
     <div id="addressbox"><label for="f_address">${t('delivery_address')}</label><textarea id="f_address" name="address" maxlength="400">${saved.address || ''}</textarea></div>
     <label for="f_notes">${t('order_notes')}</label><textarea id="f_notes" name="notes" maxlength="500" style="min-height:70px"></textarea>
-    <p class="notice"><b>${t('payment')}:</b> ${t('cod')}. ${t('no_online_payment')}</p>
+    <p class="notice"><b>${t('payment')}:</b> ${t('cod')}. ${shop.upi_id ? 'This shop also accepts UPI — after you place the order you will see its UPI details. ' : ''}${t('no_online_payment')}</p>
     ${!problems.length ? html`<div class="row" style="margin-top:14px">
       <button class="btn gold grow" type="submit" name="channel" value="web">✅ ${t('place_order')}</button>
       <button class="btn wa grow" type="submit" name="channel" value="whatsapp">💬 ${t('order_whatsapp')}</button></div>
@@ -494,6 +517,16 @@ function syncCheckout() {
 }
 document.addEventListener('change', e => { if (e.target.name === 'fulfilment') syncCheckout(); });
 
+function upiPanel(o, shop) {
+  if (!shop.upi_id || o.status === 'cancelled') return '';
+  if (o.paid) return html`<div class="notice">✅ The shop has confirmed your payment. Thank you!</div>`;
+  const link = `upi://pay?pa=${enc(shop.upi_id)}&pn=${enc(shop.name)}&am=${o.total}&cu=INR&tn=${enc('Order ' + o.code)}`;
+  return html`<div class="panel" style="margin-top:12px"><h3>💳 Want to pay by UPI? (optional)</h3>
+    <p class="small">You can pay <b>${inr(o.total)}</b> directly to the shop's UPI ID <b>${shop.upi_id}</b>. This money goes straight to the shop, not to ${siteName()}. You can still pay cash instead.</p>
+    <p><a class="btn small" href="${link}">Open UPI app (phone)</a></p><div class="qr" data-qr="${link}" style="margin:6px 0"></div>
+    ${o.pay_ref ? html`<p class="small">✅ You reported UPI reference <b>${o.pay_ref}</b>. The shop will confirm when the money arrives.</p>` : html`<form data-form="orderupi" data-code="${o.code}"><label class="small">After paying, enter the UPI reference / UTR number so the shop can match it</label>
+    <input name="ref" required minlength="6" maxlength="40" autocomplete="off"><button class="btn small" style="margin-top:8px" type="submit">I have paid</button></form>`}</div>`;
+}
 route('/order/([A-Za-z0-9]+)', async ([code], q) => {
   const data = must(await sb.rpc('track_order', { p_code: code })); if (!data) return notFound();
   const { order: o, items, shop } = data; const placed = q.get('placed');
@@ -516,8 +549,10 @@ route('/order/([A-Za-z0-9]+)', async ([code], q) => {
         ${o.address ? html`<b>${t('delivery_address')}:</b> ${o.address}<br>` : ''}${o.notes ? html`<b>${t('order_notes')}:</b> ${o.notes}` : ''}</p></div>
     <div class="panel"><h2>${t('status')}</h2><p>${statusBadge(o.status)} <span class="muted small">· ${dt(o.updated_at)}</span></p>
       ${o.status === 'new' ? html`<button class="btn danger small" type="button" data-act="ordercancel" data-code="${o.code}">${t('cancel')} order</button>` : ''}
+      ${upiPanel(o, shop)}
       <p class="small muted" style="margin-top:12px">Problem with this order? <a href="#/contact?order=${enc(o.code)}">Contact support</a> · <a href="#/refund-policy">${t('refund')}</a></p></div></div>`,
     { title: `Order ${o.code} | ${siteName()}`, noindex: true });
+  renderQRs();
   S.timer = setInterval(() => { if (location.hash.startsWith('#/order/')) router(true); }, 60000);
 });
 
@@ -550,12 +585,12 @@ route('/pricing', async () => {
   <p>${siteName()} is free to start. Here is exactly what shop owners pay — nothing is charged automatically.</p>
   <div class="shopcards">${S.plans.filter(p => p.active).map(p => html`<div class="card" style="padding:16px"><h3>${p.name}</h3>
     <div class="price" style="font-size:1.8rem">${p.price === 0 ? t('free') : html`${inr(p.price)}<span class="muted small"> / month</span>`}</div>
-    <p class="small">${p.description}</p><p class="small muted">${p.max_products ? 'Up to ' + p.max_products + ' products' : 'Unlimited products'}</p></div>`)}</div>
+    <p class="small">${p.description}</p><p class="small muted">${p.max_products ? 'Up to ' + p.max_products + ' products' : 'Unlimited products'} · ${p.max_orders_month ? 'up to ' + p.max_orders_month + ' orders per month' : 'unlimited orders'}</p></div>`)}</div>
   <div class="panel" style="margin-top:20px"><h2>All charges explained</h2><ul>
     <li><b>Starter plan:</b> free, no card or payment details needed.</li>
     <li><b>Paid plans:</b> optional. A paid plan starts only after the marketplace team confirms they have received your payment, and it is valid for the period they set.</li>
-    <li><b>Promote your shop (shown first in lists):</b> ${priceOf('promote_price_week') ? html`<b>${inr(priceOf('promote_price_week'))} per week.</b>` : ''} ${setting('featured_price_note')}</li><li><b>Banner advertisements (home and category pages, marked “Ad”):</b> ${priceOf('ad_price_week') ? html`<b>${inr(priceOf('ad_price_week'))} per week.</b>` : ''} ${setting('ad_note')}</li>
-    <li><b>Order commission:</b> ${pct > 0 ? html`${pct}% of the item value of each <i>delivered</i> order. Commission is recorded in your account and settled with the marketplace team outside the website.` : 'Currently 0%. If a commission is introduced, it will be shown here and shop owners will be informed before it applies.'}</li>
+    <li><b>Promote your shop (shown first in lists):</b> ${priceOf('promote_price_day') ? html`<b>${inr(priceOf('promote_price_day'))} per day</b> — you choose how many days.` : ''} ${setting('featured_price_note')}</li><li><b>Banner advertisements (home and category pages, marked “Ad”):</b> ${priceOf('ad_price_day') ? html`<b>${inr(priceOf('ad_price_day'))} per day</b> — you choose how many days.` : ''} ${setting('ad_note')}</li>
+    <li><b>Order commission:</b> ${pct > 0 ? html`${pct}% of the item value of each <i>delivered</i> order. Commission is recorded in your account. You pay it from the Commission page (UPI or Razorpay) or directly to the team; it is marked paid only after the team confirms the money.` : 'Currently 0%. If a commission is introduced, it will be shown here and shop owners will be informed before it applies.'}</li>
     <li><b>Payments:</b> Customer orders are paid directly to the shop (cash on delivery or at the shop); the website does not take customers' money. Shops can pay plan fees to the marketplace by UPI or Razorpay when enabled; the team confirms each payment before activating a plan, and records it in your account.</li></ul>
     <a class="btn gold" href="#/register">${t('register_shop')}</a></div></div>`,
     { title: `Plans & charges for shops | ${siteName()}`, desc: 'Free starter plan for small shops, with optional paid plans. All charges explained.' });
@@ -584,7 +619,7 @@ route('/privacy', async () => view(html`<div class="wrap"><article class="policy
 route('/terms', async () => view(html`<div class="wrap"><article class="policy"><h1>${t('terms')}</h1><p class="muted">${opLine()}.</p>
 <h2>1. What ${siteName()} is</h2><p>${siteName()} is an online marketplace that lists independent local shops. <b>The shops, not ${siteName()}, sell the products.</b> When you order, you buy from the shop. We provide the platform that connects you and the shop.</p>
 <h2>2. For customers</h2><ul><li>Give a correct name, mobile number and address so the shop can reach you.</li><li>Prices, stock and delivery details are set by each shop and may change. A shop may decline or cancel an order, for example if an item is unavailable.</li>
-<li><b>Payment:</b> ${siteName()} does not process online payments. You pay the shop directly, by cash on delivery or at the shop when you pick up, unless the shop tells you otherwise.</li>
+<li><b>Payment:</b> ${siteName()} does not process online payments. You pay the shop directly, by cash on delivery, at the shop when you pick up, or by UPI to the shop's own UPI ID if the shop accepts it. The shop, not the website, receives that money.</li>
 <li>Delivery fees, minimum order values and delivery times are shown on the shop page and at checkout when the shop has set them. Delivery times are estimates.</li><li>Do not place false orders or misuse the website.</li></ul>
 <h2>3. For shop owners</h2><ul><li>You must be the owner of the shop, or authorised to act for it, and give true information. New shops go live only after administrator approval.</li>
 <li>You are responsible for your products, prices, stock, photos and descriptions, for delivery, and for following Indian laws that apply to your goods (including food safety, labelling, GST and consumer protection laws where applicable).</li>
@@ -665,13 +700,21 @@ function ownerGuard() {
 function dashLayout(active, inner, title) {
   const sh = S.shop; const link = (path, label) => html`<a class="${active === path ? 'on' : ''}" href="#/dashboard${path}">${label}</a>`;
   view(html`<div class="wrap"><div class="dash">
-    <nav class="side" aria-label="Dashboard">${link('', '📊 Overview')}${link('/products', '📦 ' + t('products'))}${link('/orders', '🧾 ' + t('orders'))}${link('/reports', '📈 ' + t('reports'))}${link('/settings', '⚙️ ' + t('settings'))}${link('/plan', '⭐ ' + t('subscription'))}${link('/promote', '📣 Promote & Ads')}${link('/support', '💬 ' + t('support'))}${link('/password', '🔒 Password')}<a href="#/s/${enc(sh.slug)}">🏪 ${t('view_shop')}</a></nav>
+    <nav class="side" aria-label="Dashboard">${link('', '📊 Overview')}${link('/products', '📦 ' + t('products'))}${link('/orders', '🧾 ' + t('orders'))}${link('/reports', '📈 ' + t('reports'))}${link('/settings', '⚙️ ' + t('settings'))}${link('/plan', '⭐ ' + t('subscription'))}${link('/promote', '📣 Promote & Ads')}${link('/commission', '🧮 Commission')}${link('/support', '💬 ' + t('support'))}${link('/password', '🔒 Password')}<a href="#/s/${enc(sh.slug)}">🏪 ${t('view_shop')}</a></nav>
     <div>${sh.status === 'pending' ? html`<div class="notice">⏳ ${t('pending_notice')}</div>` : ''}
       ${sh.status === 'rejected' ? html`<div class="flash error">Your shop was not approved${sh.status_note ? ': ' + sh.status_note : ''}. Fix your details in Shop settings or contact support.</div>` : ''}
       ${sh.status === 'suspended' ? html`<div class="flash error">Your shop is suspended and hidden from customers${sh.status_note ? ': ' + sh.status_note : ''}. Please contact support.</div>` : ''}
       ${inner}</div></div></div>`, { title: `${title || 'Dashboard'} | ${siteName()}`, noindex: true });
 }
 
+function usageNotice(plan, prodCount, ordCount) {
+  const out = [];
+  const chk = (n, max, what) => { if (!max) return; if (n >= max) out.push(html`<div class="flash error">🚫 You have used all <b>${max}</b> ${what} on the <b>${plan.name}</b> plan. <a href="#/dashboard/plan">Upgrade your plan →</a></div>`); else if (n >= max * 0.8) out.push(html`<div class="notice">⚠️ ${n} of ${max} ${what} used on the <b>${plan.name}</b> plan. <a href="#/dashboard/plan">Upgrade →</a></div>`); };
+  chk(prodCount, plan.max_products, 'products'); chk(ordCount, plan.max_orders_month, 'orders this month');
+  if (plan.max_orders_month && ordCount >= plan.max_orders_month) out.push(html`<div class="flash error">Customers <b>cannot place new orders</b> in your shop until next month or until you upgrade.</div>`);
+  return out;
+}
+const monthOrders = list => list.filter(o => o.status !== 'cancelled' && dayKey(o.created_at).slice(0, 7) === todayIST().slice(0, 7)).length;
 route('/dashboard', async () => {
   if (!ownerGuard()) return; const sh = S.shop;
   const [orders, pc] = await Promise.all([
@@ -680,8 +723,9 @@ route('/dashboard', async () => {
   const list = must(orders); const counts = {}; list.forEach(o => { counts[o.status] = (counts[o.status] || 0) + 1; });
   const today = list.filter(o => dayKey(o.created_at) === todayIST()).length; const plan = effPlan(sh);
   dashLayout('', html`<h1>${sh.name}</h1>
+  ${usageNotice(plan, pc.count || 0, monthOrders(list))}
   <div class="stats"><div class="stat"><b>${counts.new || 0}</b><span>${t('s_new')} ${t('orders')}</span></div><div class="stat"><b>${today}</b><span>${t('orders')} today</span></div>
-    <div class="stat"><b>${pc.count || 0}</b><span>${t('products')}</span></div><div class="stat"><b>${plan.name}</b><span>${t('subscription')}</span></div></div>
+    <div class="stat"><b>${pc.count || 0}</b><span>${t('products')}</span></div><div class="stat"><b>${monthOrders(list)}${plan.max_orders_month ? ' / ' + plan.max_orders_month : ''}</b><span>Orders this month</span></div><div class="stat"><b>${plan.name}</b><span>${t('subscription')}</span></div></div>
   ${counts.new ? html`<div class="notice"><b>${counts.new}</b> new order(s) waiting. <a href="#/dashboard/orders?status=new">Open them →</a></div>` : ''}
   ${!pc.count ? html`<div class="notice">Add your first product so customers can order. <a class="btn small" href="#/dashboard/product/new">${t('add_product')}</a></div>` : ''}
   <div class="panel"><div class="row between"><h2>${t('orders')}</h2><a href="#/dashboard/orders">${t('view_all')} →</a></div>
@@ -693,7 +737,7 @@ route('/dashboard/products', async () => {
   if (!ownerGuard()) return; const sh = S.shop; const plan = effPlan(sh);
   const rows = must(await sb.from('products').select('*').eq('shop_id', sh.id).order('id', { ascending: false }));
   dashLayout('/products', html`<div class="row between mb"><h1 style="margin:0">${t('products')}</h1><a class="btn gold" href="#/dashboard/product/new">＋ ${t('add_product')}</a></div>
-  <p class="muted small">${rows.length} / ${plan.max_products || '∞'} products (${plan.name})</p>
+  <p class="muted small">${rows.length} / ${plan.max_products || '∞'} products (${plan.name})</p>${usageNotice(plan, rows.length, 0)}
   ${rows.length ? html`<div class="tablewrap"><table class="t"><tr><th></th><th>${t('name')}</th><th>${t('price')}</th><th>Stock</th><th></th></tr>
     ${rows.map(p => html`<tr><td>${imgUrl(p.image) ? html`<img class="thumb-s" src="${imgUrl(p.image)}" alt="" width="44" height="44">` : html`<span class="thumb-s">🛍️</span>`}</td>
       <td><b>${p.name}</b>${p.name_ml ? html`<br><span class="muted small">${p.name_ml}</span>` : ''}${!p.active ? html`<br><span class="tag grey">Hidden</span>` : ''}${p.blocked ? html`<br><span class="tag red">Blocked by admin</span>` : ''}</td>
@@ -732,7 +776,7 @@ route('/dashboard/orders', async (_m, q) => {
   dashLayout('/orders', html`<h1>${t('orders')}</h1>
   <div class="row gap-s mb"><a class="tag ${!status ? 'gold' : ''}" href="#/dashboard/orders">${t('all')}</a><a class="tag ${status === 'open' ? 'gold' : ''}" href="#/dashboard/orders?status=open">Open</a>${STATUSES.map(s => html`<a class="tag ${status === s ? 'gold' : ''}" href="#/dashboard/orders?status=${s}">${t('s_' + s)}</a>`)}</div>
   ${rows.length ? html`<div class="tablewrap"><table class="t"><tr><th>#</th><th>${t('name')}</th><th>${t('phone')}</th><th>${t('total')}</th><th></th><th>${t('status')}</th><th></th></tr>
-    ${rows.map(o => html`<tr><td><b>${o.code}</b><br><span class="muted small">${dt(o.created_at)}</span></td><td>${o.customer_name}</td><td>${o.customer_phone}</td><td>${inr(o.total)}</td><td>${o.fulfilment === 'delivery' ? '🛵' : '🏬'}${o.channel === 'whatsapp' ? ' 💬' : ''}</td><td>${statusBadge(o.status)}</td><td><a class="btn small" href="#/dashboard/order/${o.id}">Open</a></td></tr>`)}</table></div>
+    ${rows.map(o => html`<tr><td><b>${o.code}</b><br><span class="muted small">${dt(o.created_at)}</span></td><td>${o.customer_name}</td><td>${o.customer_phone}</td><td>${inr(o.total)}</td><td>${o.fulfilment === 'delivery' ? '🛵' : '🏬'}${o.channel === 'whatsapp' ? ' 💬' : ''}${o.paid ? ' ✅' : o.pay_ref ? ' 💳?' : ''}</td><td>${statusBadge(o.status)}</td><td><a class="btn small" href="#/dashboard/order/${o.id}">Open</a></td></tr>`)}</table></div>
     ${pager(page, Math.ceil((res.count || 0) / 20), '#/dashboard/orders?status=' + status)}` : emptyBox('No orders here yet.')}`, 'Orders');
 });
 
@@ -744,6 +788,9 @@ route('/dashboard/order/(\\d+)', async ([id]) => {
   dashLayout('/orders', html`<div class="row between"><h1>${o.code}</h1>${statusBadge(o.status)}</div>
   <div class="panel"><p><b>${o.customer_name}</b> · <a href="tel:+91${o.customer_phone}">📞 ${o.customer_phone}</a><br><span class="muted small">${dt(o.created_at)} · ${o.channel === 'whatsapp' ? 'WhatsApp' : 'Website'} order</span></p>
     <p><b>${t('how_receive')}</b> ${o.fulfilment === 'delivery' ? t('delivery') : t('pickup')}</p>
+    <p><b>Payment:</b> ${o.paid ? html`<span class="tag">✅ Paid</span>` : html`<span class="tag gold">Not marked paid</span>`}
+      ${o.pay_ref ? html`<br>Customer says they paid by UPI, reference <b>${o.pay_ref}</b>. <u>Check your UPI app / bank before marking it paid.</u>` : ''}<br>
+      <button class="btn small ${o.paid ? 'ghost' : ''}" style="margin-top:6px" type="button" data-act="markpaid" data-id="${o.id}" data-val="${o.paid ? 0 : 1}">${o.paid ? 'Mark as not paid' : '✅ Mark payment received'}</button></p>
     ${o.address ? html`<p><b>${t('delivery_address')}:</b><br><span style="white-space:pre-line">${o.address}</span></p>` : ''}${o.notes ? html`<p><b>${t('order_notes')}:</b><br>${o.notes}</p>` : ''}
     <div class="tablewrap"><table class="t">${items.map(i => html`<tr><td>${i.name} × ${i.qty}</td><td class="right">${inr(i.unit_price * i.qty)}</td></tr>`)}
       <tr><td>${t('subtotal')}</td><td class="right">${inr(o.subtotal)}</td></tr>${o.fulfilment === 'delivery' ? html`<tr><td>${t('delivery_fee')}</td><td class="right">${inr(o.delivery_fee)}</td></tr>` : ''}
@@ -776,6 +823,8 @@ route('/dashboard/settings', async () => {
   ${checkbox('Accepting orders now (untick when you are closed or busy)', 'accepting_orders', sh.accepting_orders)}${checkbox('🛵 ' + t('delivery'), 'delivery_available', sh.delivery_available)}${checkbox('🏬 ' + t('pickup'), 'pickup_available', sh.pickup_available)}
   <div class="grid2"><div>${field(t('delivery_fee') + ' (₹, 0 = free)', 'delivery_fee', sh.delivery_fee, 'type="number" min="0" inputmode="numeric"')}</div><div>${field(t('min_order') + ' (₹, 0 = none)', 'min_order', sh.min_order, 'type="number" min="0" inputmode="numeric"')}</div>
     <div>${field(t('est_delivery') + ' (e.g. Within 1 hour)', 'est_delivery', sh.est_delivery, 'type="text" maxlength="60"')}</div><div>${field('Delivery area (e.g. within 5 km)', 'delivery_area', sh.delivery_area, 'type="text" maxlength="200"')}</div></div>
+  ${field('Your UPI ID to receive customer payments (optional, e.g. name@bank)', 'upi_id', sh.upi_id, 'type="text" maxlength="60" autocomplete="off"')}
+  <p class="hint">If you add it, customers see “Pay by UPI” on their order page and the money goes straight to you. It is also visible to anyone who views your shop data, so use a UPI ID you are happy to share. You must confirm each payment yourself in your UPI app/bank.</p>
   <h2 style="margin-top:24px">${t('opening_hours')}</h2><div class="tablewrap"><table class="t"><tr><th>Day</th><th>Open</th><th>Close</th><th>Closed</th></tr>
     ${DAYS.map(d => html`<tr><td>${DAY_NAMES[d]}</td><td><input type="time" name="${d}_open" value="${hrs[d].open}" style="min-width:110px"></td><td><input type="time" name="${d}_close" value="${hrs[d].close}" style="min-width:110px"></td><td><input type="checkbox" name="${d}_closed" value="1" ${hrs[d].closed ? raw('checked') : ''} style="width:24px;height:24px"></td></tr>`)}</table></div>
   <h2 style="margin-top:24px">Shop details</h2>
@@ -793,10 +842,13 @@ route('/dashboard/settings', async () => {
 });
 
 route('/dashboard/plan', async () => {
-  if (!ownerGuard()) return; const sh = S.shop; const cur = effPlan(sh); const pct = parseFloat(setting('commission_pct')) || 0;
+  if (!ownerGuard()) return; const sh = S.shop; const cur = effPlan(sh);
+  const [uo, up] = await Promise.all([sb.from('orders').select('status,created_at').eq('shop_id', sh.id).gte('created_at', new Date(Date.now() - 40 * 864e5).toISOString()).limit(2000), sb.from('products').select('id', { count: 'exact', head: true }).eq('shop_id', sh.id)]);
+  const usage = usageNotice(cur, up.count || 0, monthOrders(must(uo)));
+  const usedO = monthOrders(must(uo)); const pct = parseFloat(setting('commission_pct')) || 0;
   const [reqs, pays] = await Promise.all([sb.from('plan_requests').select('*, plans(name)').eq('shop_id', sh.id).eq('status', 'open'), sb.from('payments').select('*').eq('shop_id', sh.id).order('id', { ascending: false })]);
   const open = must(reqs)[0]; const payments = must(pays);
-  dashLayout('/plan', html`<h1>${t('subscription')}</h1><div class="panel"><p>Current plan: <b>${cur.name}</b>${sh.plan_until && cur.price > 0 ? html` · valid until <b>${sh.plan_until}</b>` : ''}</p>${isFeatured(sh) ? html`<p><span class="tag gold">★ Featured</span> until ${sh.featured_until}</p>` : ''}</div>
+  dashLayout('/plan', html`<h1>${t('subscription')}</h1>${usage}<div class="panel"><p>Current plan: <b>${cur.name}</b> · products ${up.count || 0}/${cur.max_products || '∞'} · orders this month ${usedO}/${cur.max_orders_month || '∞'}</p><p>${sh.plan_until && cur.price > 0 ? html` · valid until <b>${sh.plan_until}</b>` : ''}</p>${isFeatured(sh) ? html`<p><span class="tag gold">★ Featured</span> until ${sh.featured_until}</p>` : ''}</div>
   <div class="shopcards mb">${S.plans.filter(p => p.active).map(p => html`<div class="card" style="padding:16px"><h3>${p.name}</h3><div class="price" style="font-size:1.6rem">${p.price === 0 ? t('free') : html`${inr(p.price)}<span class="muted small"> / month</span>`}</div><p class="small">${p.description}</p>
     ${p.id === cur.id ? html`<span class="tag">✅ Current</span>` : (p.price > 0 ? payBox(p, sh) : '')}</div>`)}</div>
   ${open ? html`<div class="notice">Your request for <b>${open.plans ? open.plans.name : ''}</b> is open. The team will contact you on WhatsApp.</div>` : ''}
@@ -839,40 +891,58 @@ async function claimPlan(planId, method, ref, amount) {
 }
 async function claimPay(type, id, method, ref, amount) {
   if (type === 'plan') return claimPlan(Number(id), method, ref, amount);
-  const table = type === 'ad' ? 'ads' : 'promo_requests';
+  const table = type === 'ad' ? 'ads' : type === 'comm' ? 'commission_claims' : 'promo_requests';
   const r = must(await sb.from(table).update({ pay_method: method, pay_ref: ref }).eq('id', id).eq('shop_id', S.shop.id).select('id'));
   if (!r.length) throw new Error('Could not save the payment reference. Please contact support with it.');
 }
 
 const claimView = r => r.pay_ref ? html`<p class="small">✅ Payment reported: <b>${r.pay_method.toUpperCase()}</b> · ${r.pay_ref}. Waiting for the team to confirm.</p>` : '';
 route('/dashboard/promote', async () => {
-  if (!ownerGuard()) return; const sh = S.shop; const pp = priceOf('promote_price_week'), ap = priceOf('ad_price_week'); const today = todayIST();
+  if (!ownerGuard()) return; const sh = S.shop; const pp = priceOf('promote_price_day'), ap = priceOf('ad_price_day'); const today = todayIST();
   let promos = [], ads = [], prods = [], tablesOk = true;
   try {
     [promos, ads, prods] = await Promise.all([sb.from('promo_requests').select('*').eq('shop_id', sh.id).order('id', { ascending: false }).limit(10), sb.from('ads').select('*').eq('shop_id', sh.id).order('id', { ascending: false }).limit(30), sb.from('products').select('id,name').eq('shop_id', sh.id).eq('active', true).order('name')]).then(r => r.map(must));
   } catch (e) { tablesOk = false; }
-  const weeksOpts = (price, sel) => [1, 2, 4, 8].map(w => html`<option value="${w}">${w} week${w > 1 ? 's' : ''} — ${inr(price * w)}</option>`);
+  const daysBox = (price, id) => html`<label for="${id}">How many days? (1–90)</label><input id="${id}" name="days" type="number" min="1" max="90" value="7" required inputmode="numeric" data-ppd="${price}" data-out="${id}_t" style="max-width:140px"> <b id="${id}_t">${inr(price * 7)}</b> <span class="muted small">(${inr(price)} per day)</span>`;
+  const dayTxt = n => `${n} day${n > 1 ? 's' : ''}`;
   dashLayout('/promote', html`<h1>Promote & Ads</h1>
   <p class="muted">Nothing is charged by the website. You pay the marketplace by UPI or Razorpay, and the team switches it on after they see your money.</p>
   ${!tablesOk ? html`<div class="flash error">Promotions are not set up yet. The administrator must run the latest <code>supabase.sql</code>.</div>` : html`
   <div class="panel"><h2>⭐ Promote my shop</h2><p>Promoted shops are shown <b>first</b> in town and category lists and in “Featured shops” on the home page.</p>
     ${isFeatured(sh) ? html`<p><span class="tag gold">★ Promoted</span> until <b>${sh.featured_until}</b></p>` : ''}
-    ${pp ? html`<form class="row" data-form="promocreate"><select name="weeks" style="max-width:260px">${weeksOpts(pp)}</select><button class="btn gold" type="submit">Continue to payment</button></form>`
+    ${pp ? html`<form data-form="promocreate">${daysBox(pp, 'prd')}<br><button class="btn gold" type="submit">Continue to payment</button></form>`
         : html`<p class="notice">Promotion rates have not been published yet. <a href="#/contact">Ask the team</a>.</p>`}
-    ${promos.filter(r => r.status === 'open').map(r => html`<div class="panel" style="margin-top:12px"><b>${r.weeks} week${r.weeks > 1 ? 's' : ''} promotion — ${inr(r.amount)}</b> <span class="tag gold">waiting</span>
+    ${promos.filter(r => r.status === 'open').map(r => html`<div class="panel" style="margin-top:12px"><b>${dayTxt(r.days || r.weeks * 7)} promotion — ${inr(r.amount)}</b> <span class="tag gold">waiting</span>
       ${r.pay_ref ? claimView(r) : html`${payOptions({ amount: r.amount, note: `${siteName()} promote - ${sh.name}`, type: 'promo', id: r.id }) || html`<p class="small muted">Online payment is not switched on yet. Please contact the team.</p>`}`}</div>`)}
-    ${promos.filter(r => r.status !== 'open').length ? html`<p class="small muted">Earlier: ${promos.filter(r => r.status !== 'open').map(r => `${r.weeks}w ${r.status} (${dOnly(r.created_at)})`).join(' · ')}</p>` : ''}</div>
+    ${promos.filter(r => r.status !== 'open').length ? html`<p class="small muted">Earlier: ${promos.filter(r => r.status !== 'open').map(r => `${r.days || r.weeks * 7}d ${r.status} (${dOnly(r.created_at)})`).join(' · ')}</p>` : ''}</div>
   <div class="panel"><h2>📣 Banner advertisement</h2><p>Your banner appears between the products on the <b>home page</b> and category pages, marked “${adLabel()}”. The team checks every banner before it goes live.</p>
     ${ap ? html`<form data-form="adcreate" novalidate>${field('Headline (3–80 letters)', 'title', '', 'type="text" required maxlength="80"')}${field('Short text (optional)', 'body', '', 'type="text" maxlength="160"')}
       <label for="f_product_id">Open this when tapped</label><select id="f_product_id" name="product_id"><option value="">My shop page</option>${prods.map(p => html`<option value="${p.id}">${p.name}</option>`)}</select>
       <label for="f_adimage">Banner picture (optional, landscape looks best)</label><img id="preview_ad" alt="" width="200" height="100" style="display:none;border-radius:12px;margin-bottom:8px;object-fit:cover"><input id="f_adimage" type="file" name="image" accept="image/jpeg,image/png,image/webp" data-preview="preview_ad">
-      <label for="f_adweeks">How long</label><select id="f_adweeks" name="weeks">${weeksOpts(ap)}</select>
+      ${daysBox(ap, 'add')}
       <button class="btn gold" style="margin-top:14px" type="submit">Continue to payment</button></form>` : html`<p class="notice">Advertising rates have not been published yet. <a href="#/contact">Ask the team</a>.</p>`}</div>
   ${ads.length ? html`<h2>Your ads</h2>${ads.map(a => html`<div class="panel"><div class="row between"><b>${a.title}</b><span class="tag ${a.status === 'approved' ? '' : a.status === 'rejected' ? 'red' : 'gold'}">${a.status}</span></div>
-    <p class="small muted">${a.weeks} week${a.weeks > 1 ? 's' : ''} · ${inr(a.amount)}${a.status === 'approved' ? ` · runs ${a.starts_on} to ${a.ends_on}${a.ends_on < today ? ' (ended)' : ''}` : ''}</p>
+    <p class="small muted">${dayTxt(a.days || a.weeks * 7)} · ${inr(a.amount)}${a.status === 'approved' ? ` · runs ${a.starts_on} to ${a.ends_on}${a.ends_on < today ? ' (ended)' : ''}` : ''}</p>
     ${imgUrl(a.image) ? html`<img src="${imgUrl(a.image)}" alt="" width="200" height="100" style="border-radius:12px;object-fit:cover">` : ''}${a.admin_note ? html`<p class="notice"><b>Team note:</b> ${a.admin_note}</p>` : ''}
     ${a.status === 'pending' ? (a.pay_ref ? claimView(a) : payOptions({ amount: a.amount, note: `${siteName()} ad - ${sh.name}`, type: 'ad', id: a.id }) || html`<p class="small muted">Online payment is not switched on yet. Please contact the team.</p>`) : ''}
     ${a.status === 'pending' ? html`<button class="btn danger small" style="margin-top:8px" type="button" data-act="delad" data-id="${a.id}">Delete this ad</button>` : ''}</div>`)}` : ''}`}`, 'Promote');
+  renderQRs();
+});
+
+route('/dashboard/commission', async () => {
+  if (!ownerGuard()) return; const sh = S.shop; const pct = parseFloat(setting('commission_pct')) || 0;
+  let orders = [], pays = [], claims = [], ok = true;
+  try { [orders, pays, claims] = await Promise.all([sb.from('orders').select('code,total,commission_pct,commission_amount,created_at').eq('shop_id', sh.id).eq('status', 'delivered').order('id', { ascending: false }).limit(2000), sb.from('payments').select('amount,created_at,reference').eq('shop_id', sh.id).eq('kind', 'commission').order('id', { ascending: false }), sb.from('commission_claims').select('*').eq('shop_id', sh.id).order('id', { ascending: false }).limit(10)]).then(r => r.map(must)); } catch (e) { ok = false; }
+  const earned = orders.reduce((a, o) => a + Number(o.commission_amount), 0), paid = pays.reduce((a, p) => a + p.amount, 0); const due = Math.max(0, Math.round(earned - paid)); const open = claims.find(c => c.status === 'open');
+  dashLayout('/commission', html`<h1>Commission</h1>
+  <p class="muted">The marketplace charges ${pct > 0 ? html`<b>${pct}%</b> of the item value` : 'no commission right now'} on each <b>delivered</b> order. Customers pay <i>you</i> directly, so you pay the commission to the marketplace. Nothing is taken automatically.</p>
+  ${!ok ? html`<div class="flash error">Commission payments are not set up yet. The administrator must run the latest <code>supabase.sql</code>.</div>` : html`
+  <div class="stats"><div class="stat"><b>${inr(earned)}</b><span>Commission earned</span></div><div class="stat"><b>${inr(paid)}</b><span>Paid (confirmed)</span></div><div class="stat"><b>${inr(due)}</b><span>Due now</span></div></div>
+  ${open ? html`<div class="panel"><b>Payment of ${inr(open.amount)}</b> <span class="tag gold">waiting for the team</span>
+    ${open.pay_ref ? claimView(open) : html`${payOptions({ amount: open.amount, note: `${siteName()} commission - ${sh.name}`, type: 'comm', id: open.id }) || html`<p class="small muted">Online payment is not switched on yet. Please contact the team to pay.</p>`}`}</div>`
+    : due >= 1 ? html`<form class="panel" data-form="commcreate"><p>You owe <b>${inr(due)}</b>.</p><button class="btn gold" type="submit">Pay ${inr(due)} now</button><p class="hint">Next you will see UPI / Razorpay options. Your commission is marked paid only after the team sees the money.</p></form>` : html`<div class="notice">Nothing due right now. 🎉</div>`}
+  ${orders.length ? html`<div class="panel"><h2>Delivered orders</h2><div class="tablewrap"><table class="t"><tr><th>Order</th><th>Order total</th><th>%</th><th>Commission</th></tr>${orders.slice(0, 50).map(o => html`<tr><td>${o.code}<br><span class="muted small">${dOnly(o.created_at)}</span></td><td>${inr(o.total)}</td><td>${o.commission_pct}%</td><td>${inr(o.commission_amount)}</td></tr>`)}</table></div></div>` : ''}
+  ${pays.length ? html`<div class="panel"><h2>Commission payments confirmed</h2><div class="tablewrap"><table class="t"><tr><th>Date</th><th>Amount</th><th>Reference</th></tr>${pays.map(p => html`<tr><td>${dOnly(p.created_at)}</td><td>${inr(p.amount)}</td><td>${p.reference}</td></tr>`)}</table></div></div>` : ''}`}`, 'Commission');
   renderQRs();
 });
 
@@ -1001,8 +1071,8 @@ route('/admin/plans', async () => {
   adminLayout('/plans', html`<h1>Subscription plans</h1>
   ${reqs.length ? html`<div class="panel"><h2>Upgrade requests</h2><div class="tablewrap"><table class="t"><tr><th>Shop</th><th>Plan</th><th>Payment claimed</th><th>Requested</th><th></th></tr>${reqs.map(r => html`<tr><td><a href="#/admin/shop/${r.shop_id}">${one(r.shops).name}</a></td><td>${one(r.plans).name} (${inr(one(r.plans).price)})</td><td>${r.pay_method ? html`<b>${r.pay_method.toUpperCase()}</b> ${inr(r.amount)}<br><span class="small">${r.pay_ref}</span>` : html`<span class="muted">not paid yet</span>`}</td><td>${dOnly(r.created_at)}</td><td><button class="btn ghost small" type="button" data-act="dismissreq" data-id="${r.id}">Dismiss</button></td></tr>`)}</table></div>
     <p class="hint">Check the claimed payment in your bank or Razorpay dashboard, record it on the shop page, then set the plan and its end date.</p></div>` : ''}
-  <div class="panel"><h2>Add a plan</h2><form class="row" data-form="planadd"><input name="name" placeholder="Name" required maxlength="40" style="max-width:180px"><input name="price" type="number" placeholder="₹ / month" min="0" required style="max-width:130px"><input name="max_products" type="number" placeholder="Max products (0=unlimited)" min="0" style="max-width:220px"><input name="description" placeholder="Description shown to shops" maxlength="300" style="max-width:300px"><button class="btn" type="submit">Add</button></form></div>
-  ${S.plans.map(p => html`<form class="panel" data-form="plansave" data-id="${p.id}"><div class="grid2"><div>${field('Name', 'name', p.name, 'maxlength="40"')}</div><div>${field('Price (₹ per month)', 'price', p.price, 'type="number" min="0"')}</div><div>${field('Max products (0 = unlimited)', 'max_products', p.max_products, 'type="number" min="0"')}</div><div>${field('Order', 'sort', p.sort, 'type="number"')}</div></div>
+  <div class="panel"><h2>Add a plan</h2><form class="row" data-form="planadd"><input name="name" placeholder="Name" required maxlength="40" style="max-width:180px"><input name="price" type="number" placeholder="₹ / month" min="0" required style="max-width:130px"><input name="max_products" type="number" placeholder="Max products (0=unlimited)" min="0" style="max-width:220px"><input name="max_orders_month" type="number" placeholder="Max orders / month (0=unlimited)" min="0" style="max-width:250px"><input name="description" placeholder="Description shown to shops" maxlength="300" style="max-width:300px"><button class="btn" type="submit">Add</button></form></div>
+  ${S.plans.map(p => html`<form class="panel" data-form="plansave" data-id="${p.id}"><div class="grid2"><div>${field('Name', 'name', p.name, 'maxlength="40"')}</div><div>${field('Price (₹ per month)', 'price', p.price, 'type="number" min="0"')}</div><div>${field('Max products (0 = unlimited)', 'max_products', p.max_products, 'type="number" min="0"')}</div><div>${field('Max orders per month (0 = unlimited)', 'max_orders_month', p.max_orders_month, 'type="number" min="0"')}</div><div>${field('Order', 'sort', p.sort, 'type="number"')}</div></div>
     ${field('Description', 'description', p.description, 'maxlength="300"')}${checkbox('Offered to shops', 'active', p.active)}<button class="btn small" type="submit">Save</button></form>`)}`, 'Plans');
 });
 
@@ -1013,16 +1083,16 @@ route('/admin/promotions', async () => {
   const warn = html`<p class="hint"><u>Check the payment in your bank / Razorpay dashboard first.</u> A reference typed by a shop is only a claim.</p>`;
   adminLayout('/promotions', html`<h1>Ads & promotions</h1>
   <h2>Promotion requests (featured shops)</h2>
-  ${P.filter(r => r.status === 'open').length ? P.filter(r => r.status === 'open').map(r => { const base = r.shops.featured_until && r.shops.featured_until > today ? r.shops.featured_until : today; return html`<form class="panel" data-form="promoact" data-id="${r.id}" data-shop="${r.shop_id}" data-weeks="${r.weeks}" data-base="${base}" data-amount="${r.amount}" data-ref="${r.pay_ref}">
-    <b><a href="#/admin/shop/${r.shop_id}">${r.shops.name}</a></b> — ${r.weeks} week${r.weeks > 1 ? 's' : ''}, ${inr(r.amount)} · ${dOnly(r.created_at)}<br>${claim(r)}${warn}
-    <p class="small">If activated, the shop is promoted until <b>${addDays(base, r.weeks * 7)}</b>.</p>${r.pay_ref ? checkbox('Also record ' + inr(r.amount) + ' in Payments', 'rec', true) : ''}
+  ${P.filter(r => r.status === 'open').length ? P.filter(r => r.status === 'open').map(r => { const base = r.shops.featured_until && r.shops.featured_until > today ? r.shops.featured_until : today; return html`<form class="panel" data-form="promoact" data-id="${r.id}" data-shop="${r.shop_id}" data-days="${r.days || r.weeks * 7}" data-base="${base}" data-amount="${r.amount}" data-ref="${r.pay_ref}">
+    <b><a href="#/admin/shop/${r.shop_id}">${r.shops.name}</a></b> — ${r.days || r.weeks * 7} day(s), ${inr(r.amount)} · ${dOnly(r.created_at)}<br>${claim(r)}${warn}
+    <p class="small">If activated, the shop is promoted until <b>${addDays(base, r.days || r.weeks * 7)}</b>.</p>${r.pay_ref ? checkbox('Also record ' + inr(r.amount) + ' in Payments', 'rec', true) : ''}
     <div class="row"><button class="btn small" type="submit" name="action" value="activate">✅ Activate</button><button class="btn danger small" type="submit" name="action" value="dismiss">Dismiss</button></div></form>`; }) : emptyBox('No open promotion requests.')}
   <h2 style="margin-top:24px">Banner ads</h2>
   ${A.length ? A.map(a => html`<form class="panel" data-form="adreview" data-id="${a.id}" data-shop="${a.shop_id}" data-amount="${a.amount}" data-ref="${a.pay_ref}" data-status="${a.status}">
     <div class="row between"><b>${a.title}</b><span class="tag ${a.status === 'approved' ? '' : a.status === 'pending' ? 'gold' : 'red'}">${a.status}</span></div>
-    <p class="small muted"><a href="#/admin/shop/${a.shop_id}">${one(a.shops).name}</a> · ${a.weeks} week${a.weeks > 1 ? 's' : ''} · ${inr(a.amount)} · ${dOnly(a.created_at)}<br>${a.body}</p>
+    <p class="small muted"><a href="#/admin/shop/${a.shop_id}">${one(a.shops).name}</a> · ${a.days || a.weeks * 7} day(s) · ${inr(a.amount)} · ${dOnly(a.created_at)}<br>${a.body}</p>
     ${imgUrl(a.image) ? html`<img src="${imgUrl(a.image)}" alt="" width="240" height="120" style="border-radius:12px;object-fit:cover">` : ''}<p>${claim(a)}</p>${a.status === 'pending' ? warn : ''}
-    <div class="grid2"><div><label>Starts</label><input type="date" name="starts_on" value="${a.starts_on || today}"></div><div><label>Ends</label><input type="date" name="ends_on" value="${a.ends_on || addDays(today, a.weeks * 7)}"></div></div>
+    <div class="grid2"><div><label>Starts</label><input type="date" name="starts_on" value="${a.starts_on || today}"></div><div><label>Ends</label><input type="date" name="ends_on" value="${a.ends_on || addDays(today, a.days || a.weeks * 7)}"></div></div>
     <label>Note to the shop (shown if rejected)</label><input name="admin_note" value="${a.admin_note}" maxlength="300">
     ${a.status === 'pending' && a.pay_ref ? checkbox('When approving, also record ' + inr(a.amount) + ' in Payments', 'rec', true) : ''}
     <div class="row" style="margin-top:10px">${a.status !== 'approved' ? html`<button class="btn small" type="submit" name="action" value="approved">✅ Approve</button>` : html`<button class="btn small" type="submit" name="action" value="approved">Save dates</button>`}
@@ -1044,7 +1114,11 @@ route('/admin/commissions', async () => {
   const m = {}; must(ords).forEach(o => { const r = m[o.shop_id] = m[o.shop_id] || { id: o.shop_id, name: one(o.shops).name, earned: 0, paid: 0, delivered: 0 }; r.earned += Number(o.commission_amount); r.delivered++; });
   must(pays).forEach(p => { const r = m[p.shop_id] = m[p.shop_id] || { id: p.shop_id, name: '#' + p.shop_id, earned: 0, paid: 0, delivered: 0 }; r.paid += p.amount; });
   const rows = Object.values(m).filter(r => r.earned > 0 || r.paid > 0).sort((a, b) => b.earned - a.earned);
-  adminLayout('/commissions', html`<h1>Commissions</h1><p class="muted small">Current commission rate: <b>${setting('commission_pct') || 0}%</b> of item value on delivered orders (change it in Settings; each order keeps the rate that applied when it was placed). “Due” = earned minus commission payments you recorded on the shop's page.</p>
+  let claims = []; try { claims = must(await sb.from('commission_claims').select('*, shops(name)').eq('status', 'open').order('id')); } catch (e) { claims = []; }
+  adminLayout('/commissions', html`<h1>Commissions</h1>
+  ${claims.length ? html`<div class="panel"><h2>Payments reported by shops</h2><p class="hint"><u>Check the money in your bank / Razorpay dashboard first.</u> A reference typed by a shop is only a claim.</p>
+    ${claims.map(c => html`<form class="row between" data-form="commact" data-id="${c.id}" data-shop="${c.shop_id}" data-amount="${c.amount}" data-ref="${c.pay_ref}" style="border-top:1px solid var(--line);padding:10px 0"><span><a href="#/admin/shop/${c.shop_id}">${one(c.shops).name}</a> — <b>${inr(c.amount)}</b> · ${c.pay_ref ? html`${c.pay_method.toUpperCase()} ref <b>${c.pay_ref}</b>` : html`<span class="muted">no payment reported yet</span>`}</span>
+      <span class="row"><button class="btn small" type="submit" name="action" value="confirm">✅ Money received</button><button class="btn danger small" type="submit" name="action" value="dismiss">Dismiss</button></span></form>`)}</div>` : ''}<p class="muted small">Current commission rate: <b>${setting('commission_pct') || 0}%</b> of item value on delivered orders (change it in Settings; each order keeps the rate that applied when it was placed). “Due” = earned minus commission payments you recorded on the shop's page.</p>
   ${rows.length ? html`<div class="tablewrap"><table class="t"><tr><th>Shop</th><th>Delivered orders</th><th>Earned</th><th>Paid</th><th>Due</th></tr>${rows.map(r => html`<tr><td><a href="#/admin/shop/${r.id}">${r.name}</a></td><td>${r.delivered}</td><td>${inr(r.earned)}</td><td>${inr(r.paid)}</td><td><b>${inr(r.earned - r.paid)}</b></td></tr>`)}</table></div>` : emptyBox('No commission has been earned yet.')}`, 'Commissions');
 });
 
@@ -1066,7 +1140,7 @@ route('/admin/settings', async () => {
   ${field('Order commission (% of item value on delivered orders, 0 = none)', 'commission_pct', setting('commission_pct'), 'type="number" min="0" max="30" step="0.1"')}<p class="hint">Applies only to new orders. Shown to shop owners on the Plans & charges page. Commission is recorded, not collected by the website.</p>
   <h2 style="margin-top:22px">Receive payments from shops</h2>
   <div class="grid2"><div>${field('Your UPI ID (e.g. name@bank)', 'upi_id', setting('upi_id'), 'maxlength="60" autocomplete="off"')}</div><div>${field('Name shown in the UPI app', 'upi_name', setting('upi_name'), 'maxlength="40"')}</div>
-    <div>${field('Promote shop: price per week (₹)', 'promote_price_week', setting('promote_price_week'), 'type="number" min="0" inputmode="numeric"')}</div><div>${field('Banner ad: price per week (₹)', 'ad_price_week', setting('ad_price_week'), 'type="number" min="0" inputmode="numeric"')}</div>
+    <div>${field('Promote shop: price per day (₹)', 'promote_price_day', setting('promote_price_day'), 'type="number" min="0" inputmode="numeric"')}</div><div>${field('Banner ad: price per day (₹)', 'ad_price_day', setting('ad_price_day'), 'type="number" min="0" inputmode="numeric"')}</div>
     <div>${field('Razorpay Key ID (starts with rzp_)', 'razorpay_key_id', setting('razorpay_key_id'), 'maxlength="60" autocomplete="off" placeholder="rzp_live_..."')}</div></div>
   <p class="hint">Shops then see “Pay by UPI” and “Pay with Razorpay” on their Subscription page. Paste only the Razorpay <b>Key ID</b>, never the Key Secret. Plans are activated by you after you see the money in your bank / Razorpay dashboard; the website does not verify payments automatically. Leave a box empty to hide that option.</p>
   <h2 style="margin-top:22px">Business & contact details (shown on policy and contact pages)</h2>${field('Operator / business name', 'operator_name', setting('operator_name'), 'maxlength="120"')}
@@ -1092,6 +1166,16 @@ async function addToCart(pid, shopId, stock, qty, el) {
   cart.items[pid] = Math.min((cart.items[pid] || 0) + qty, limit, 99); cartSet(cart); toast(t('add_to_cart') + ' ✓');
 }
 const actions = {
+  appmode() {
+    S.app = !S.app; ls.set('nk_app', S.app);
+    if (Math.min(screen.width, screen.height) < 700) { location.reload(); return; } // phones: reload so the page width switches (website = compact desktop-style, app = phone layout)
+    renderChrome(); window.scrollTo(0, 0);
+    if (S.app) { toast(S.lang === 'ml' ? 'ആപ്പ് മോഡ്. താഴെ മെനു ഉപയോഗിക്കാം.' : 'App mode on. Use the menu at the bottom.'); if (S.installEvt) toast(S.lang === 'ml' ? 'ഫോണിൽ ഇൻസ്റ്റാൾ ചെയ്യാൻ "ഇൻസ്റ്റാൾ" ടാപ്പ് ചെയ്യുക.' : 'Tap "Install" to add it to your phone.'); }
+  },
+  async install() {
+    if (S.installEvt) { S.installEvt.prompt(); try { await S.installEvt.userChoice; } catch (e) { /* ignore */ } S.installEvt = null; renderChrome(); return; }
+    toast(S.lang === 'ml' ? 'ബ്രൗസർ മെനുവിൽ നിന്ന് "Add to Home screen" (iPhone: Share → Add to Home Screen) തിരഞ്ഞെടുക്കുക.' : 'In your browser menu choose "Add to Home screen" (iPhone: Share → Add to Home Screen).', 'ok');
+  },
   lang(el) { S.lang = el.dataset.lang === 'ml' ? 'ml' : 'en'; ls.set('nk_lang', S.lang); renderChrome(); router(true); },
   clearplace() { S.place = ''; ls.set('nk_place', ''); renderChrome(); router(true); },
   async logout() { await sb.auth.signOut(); S.user = S.profile = S.shop = null; renderChrome(); location.hash = '#/'; },
@@ -1114,13 +1198,14 @@ const actions = {
   },
   async razorpay(el) {
     const key = setting('razorpay_key_id'); const type = el.dataset.type || 'plan'; let amount = Number(el.dataset.amount) || 0, desc = 'Payment';
-    if (type === 'plan') { const p = S.plans.find(x => String(x.id) === el.dataset.id); if (!p) return; amount = p.price; desc = p.name + ' plan - 1 month'; } else desc = type === 'ad' ? 'Banner advertisement' : 'Shop promotion';
+    if (type === 'plan') { const p = S.plans.find(x => String(x.id) === el.dataset.id); if (!p) return; amount = p.price; desc = p.name + ' plan - 1 month'; } else desc = type === 'ad' ? 'Banner advertisement' : type === 'comm' ? 'Order commission' : 'Shop promotion';
     if (!key || amount < 1) return; await loadRazorpay();
     const rzp = new window.Razorpay({ key, amount: amount * 100, currency: 'INR', name: siteName(), description: desc, prefill: { name: S.shop.owner_name, email: S.user.email, contact: S.profile.phone || S.shop.whatsapp },
       notes: { shop_id: String(S.shop.id), type, ref_id: String(el.dataset.id) }, theme: { color: '#0f6b3e' },
       handler: r => { claimPay(type, el.dataset.id, 'razorpay', r.razorpay_payment_id, amount).then(() => { toast('Payment received by Razorpay (' + r.razorpay_payment_id + '). The team will confirm it and activate it.'); router(true); }).catch(e => toast('Paid, but saving failed: ' + e.message + ' Payment ID: ' + r.razorpay_payment_id, 'error')); } });
     rzp.on('payment.failed', r => toast('Payment failed: ' + ((r.error && r.error.description) || 'please try again'), 'error')); rzp.open();
   },
+  async markpaid(el) { must(await sb.from('orders').update({ paid: el.dataset.val === '1' }).eq('id', el.dataset.id).eq('shop_id', S.shop.id)); toast(el.dataset.val === '1' ? 'Marked as paid.' : 'Marked as not paid.'); router(true); },
   async delad(el) {
     if (!confirm('Delete this ad request?')) return;
     const a = must(await sb.from('ads').select('image').eq('id', el.dataset.id).eq('shop_id', S.shop.id).maybeSingle());
@@ -1138,6 +1223,7 @@ document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]'); if (!el || !actions[el.dataset.act]) return; e.preventDefault();
   Promise.resolve().then(() => actions[el.dataset.act](el, e)).catch(err => toast(err.message, 'error'));
 });
+document.addEventListener('input', e => { const i = e.target; if (i.dataset && i.dataset.ppd) { const o = document.getElementById(i.dataset.out); const d = Math.max(0, Math.min(90, parseInt(i.value, 10) || 0)); if (o) o.textContent = inr(d * Number(i.dataset.ppd)); } });
 document.addEventListener('change', e => {
   const inp = e.target; if (inp.type === 'file' && inp.dataset.preview && inp.files[0]) { const img = document.getElementById(inp.dataset.preview); if (img) { img.src = URL.createObjectURL(inp.files[0]); img.style.display = 'block'; } }
 });
@@ -1181,15 +1267,25 @@ const forms = {
     const res = must(await sb.rpc('place_order', { p_shop: cart.shopId, p_items: items, p_name: name, p_phone: phone, p_address: address, p_notes: cleanML(fd.get('notes'), 500), p_fulfilment: mode, p_channel: channel }));
     ls.set('nk_customer', { name, phone, address }); cartSet({ shopId: null, items: {} }); location.hash = `#/order/${res.code}?placed=1`;
   },
+  async commcreate(f, fd) {
+    const [o, p] = await Promise.all([sb.from('orders').select('commission_amount').eq('shop_id', S.shop.id).eq('status', 'delivered').limit(5000), sb.from('payments').select('amount').eq('shop_id', S.shop.id).eq('kind', 'commission')]);
+    const due = Math.round(must(o).reduce((a, x) => a + Number(x.commission_amount), 0) - must(p).reduce((a, x) => a + x.amount, 0)); if (due < 1) throw new Error('Nothing is due.');
+    const ex = must(await sb.from('commission_claims').select('id').eq('shop_id', S.shop.id).eq('status', 'open')); if (!ex.length) must(await sb.from('commission_claims').insert({ shop_id: S.shop.id, amount: due }));
+    toast('Now pay using one of the options below.'); router(true);
+  },
+  async orderupi(f, fd) {
+    const ref = clean(fd.get('ref'), 40); if (ref.length < 6) throw new Error('Enter the UPI reference / UTR number (at least 6 characters).');
+    const ok = must(await sb.rpc('claim_order_payment', { p_code: f.dataset.code, p_ref: ref })); toast(ok ? 'Thank you. The shop will check and confirm your payment.' : 'This order cannot take a payment reference.', ok ? 'ok' : 'error'); router(true);
+  },
   async promocreate(f, fd) {
-    const w = toInt(fd.get('weeks'), 1, 12), pp = priceOf('promote_price_week'); if (!w || !pp) throw new Error('Promotion is not available right now.');
-    must(await sb.from('promo_requests').insert({ shop_id: S.shop.id, weeks: w, amount: pp * w })); toast('Request created. Now pay using one of the options below.'); router(true);
+    const w = toInt(fd.get('days'), 1, 90), pp = priceOf('promote_price_day'); if (!w || !pp) throw new Error('Promotion is not available right now.');
+    must(await sb.from('promo_requests').insert({ shop_id: S.shop.id, days: w, amount: pp * w })); toast('Request created. Now pay using one of the options below.'); router(true);
   },
   async adcreate(f, fd) {
-    const w = toInt(fd.get('weeks'), 1, 12), ap = priceOf('ad_price_week'), title = clean(fd.get('title'), 80); if (!w || !ap) throw new Error('Advertising is not available right now.');
+    const w = toInt(fd.get('days'), 1, 90), ap = priceOf('ad_price_day'), title = clean(fd.get('title'), 80); if (!w || !ap) throw new Error('Advertising is not available right now.');
     if (title.length < 3) throw new Error('Please write a headline (at least 3 letters).');
     const file = fd.get('image'); const img = file && file.size ? await uploadImage(file, 1200) : null;
-    try { must(await sb.from('ads').insert({ shop_id: S.shop.id, title, body: clean(fd.get('body'), 160), image: img, product_id: toInt(fd.get('product_id'), 1), weeks: w, amount: ap * w })); }
+    try { must(await sb.from('ads').insert({ shop_id: S.shop.id, title, body: clean(fd.get('body'), 160), image: img, product_id: toInt(fd.get('product_id'), 1), days: w, amount: ap * w })); }
     catch (e) { if (img) removeImage(img); throw e; }
     toast('Ad saved. Now pay using one of the options below. It goes live after the team checks it.'); router(true);
   },
@@ -1257,11 +1353,12 @@ const forms = {
     if (fee === null || minOrder === null) errs.push('Delivery fee and minimum order must be whole rupee amounts.'); const whatsapp = normPhone(fd.get('whatsapp')); if (!whatsapp) errs.push('Please enter a valid 10-digit WhatsApp number.');
     if (!/^\d{6}$/.test(g('pincode'))) errs.push('PIN code must be 6 digits.'); if (g('name').length < 2 || g('town').length < 2 || cleanML(fd.get('address'), 300).length < 6) errs.push('Please fill in the shop name, address and town.');
     if (g('map_link') && !isHttps(g('map_link'))) errs.push('Map link must start with https:// (or leave it empty).');
+    const upi = clean(fd.get('upi_id'), 60); if (upi && !/^[\w.\-]{2,}@[A-Za-z]{2,}$/.test(upi)) errs.push('UPI ID looks wrong. It should look like name@bank.');
     const hours = {}; DAYS.forEach(d => { const o = fd.get(d + '_open') || '09:00', c = fd.get(d + '_close') || '21:00'; if (!/^\d\d:\d\d$/.test(o) || !/^\d\d:\d\d$/.test(c)) errs.push('Opening hours must be times like 09:00.'); hours[d] = { open: o, close: c, closed: !!fd.get(d + '_closed') }; });
     if (errs.length) throw new Error(errs[0]);
     const logoFile = fd.get('logo'); const logo = logoFile && logoFile.size ? await uploadImage(logoFile, 600) : null;
     const row = { name: g('name'), description: cleanML(fd.get('description'), 600), owner_name: g('owner_name'), address: cleanML(fd.get('address'), 300), locality: g('locality'), town: g('town'), district: g('district'), pincode: g('pincode'), map_link: g('map_link'), whatsapp, category_id: toInt(fd.get('category_id'), 1),
-      accepting_orders: !!fd.get('accepting_orders'), delivery_available: !!fd.get('delivery_available'), pickup_available: !!fd.get('pickup_available'), delivery_fee: fee, min_order: minOrder, est_delivery: g('est_delivery'), delivery_area: g('delivery_area'), hours };
+      accepting_orders: !!fd.get('accepting_orders'), delivery_available: !!fd.get('delivery_available'), pickup_available: !!fd.get('pickup_available'), delivery_fee: fee, min_order: minOrder, est_delivery: g('est_delivery'), delivery_area: g('delivery_area'), hours, upi_id: upi };
     if (logo) row.logo = logo;
     try { must(await sb.from('shops').update(row).eq('id', sh.id)); } catch (e) { if (logo) removeImage(logo); throw e; }
     if (logo) removeImage(sh.logo); await loadProfile(); toast('Shop settings saved.'); router(true);
@@ -1283,12 +1380,19 @@ const forms = {
     const amount = toInt(fd.get('amount'), 1, 10000000); if (!amount) throw new Error('Enter a valid amount and type.');
     must(await sb.from('payments').insert({ shop_id: Number(f.dataset.id), kind: fd.get('kind'), amount, reference: clean(fd.get('reference'), 80), note: clean(fd.get('note'), 200) })); toast('Payment recorded.'); router(true);
   },
+  async commact(f, fd, ev) {
+    const action = ev && ev.submitter ? ev.submitter.value : ''; const d = f.dataset;
+    if (action === 'dismiss') { must(await sb.from('commission_claims').update({ status: 'dismissed' }).eq('id', d.id)); toast('Dismissed.'); return router(true); }
+    if (action !== 'confirm') return;
+    must(await sb.from('payments').insert({ shop_id: Number(d.shop), kind: 'commission', amount: Number(d.amount), reference: d.ref, note: 'Commission paid by shop' })); must(await sb.from('commission_claims').update({ status: 'done' }).eq('id', d.id));
+    toast('Commission payment recorded.'); router(true);
+  },
   async promoact(f, fd, ev) {
     const action = ev && ev.submitter ? ev.submitter.value : ''; const d = f.dataset;
     if (action === 'dismiss') { must(await sb.from('promo_requests').update({ status: 'dismissed' }).eq('id', d.id)); toast('Dismissed.'); return router(true); }
-    if (action !== 'activate') return; const until = addDays(d.base, Number(d.weeks) * 7);
+    if (action !== 'activate') return; const until = addDays(d.base, Number(d.days));
     must(await sb.from('shops').update({ featured_until: until }).eq('id', d.shop)); must(await sb.from('promo_requests').update({ status: 'done' }).eq('id', d.id));
-    if (fd.get('rec')) must(await sb.from('payments').insert({ shop_id: Number(d.shop), kind: 'featured', amount: Number(d.amount), reference: d.ref, note: 'Promotion ' + d.weeks + ' week(s)' }));
+    if (fd.get('rec')) must(await sb.from('payments').insert({ shop_id: Number(d.shop), kind: 'featured', amount: Number(d.amount), reference: d.ref, note: 'Promotion ' + d.days + ' day(s)' }));
     toast('Shop promoted until ' + until + '.'); router(true);
   },
   async adreview(f, fd, ev) {
@@ -1304,12 +1408,12 @@ const forms = {
   },
   async catsave(f, fd) { must(await sb.from('categories').update({ name_en: clean(fd.get('name_en'), 40), name_ml: clean(fd.get('name_ml'), 40), icon: clean(fd.get('icon'), 4) || '🛍️', sort: toInt(fd.get('sort'), 0, 999) ?? 100, active: !!fd.get('active') }).eq('id', f.dataset.id)); await loadBase(); toast('Category saved.'); router(true); },
   async planadd(f, fd) {
-    const price = toInt(fd.get('price'), 0, 100000), mx = toInt(fd.get('max_products') || 0, 0, 100000), name = clean(fd.get('name'), 40); if (name.length < 2 || price === null || mx === null) throw new Error('Enter a name, a price in rupees and the product limit (0 = unlimited).');
-    must(await sb.from('plans').insert({ name, price, max_products: mx, description: clean(fd.get('description'), 300) })); await loadBase(); toast('Plan added.'); router(true);
+    const price = toInt(fd.get('price'), 0, 100000), mx = toInt(fd.get('max_products') || 0, 0, 100000), mo = toInt(fd.get('max_orders_month') || 0, 0, 1000000), name = clean(fd.get('name'), 40); if (name.length < 2 || price === null || mx === null || mo === null) throw new Error('Enter a name, a price in rupees and the limits (0 = unlimited).');
+    must(await sb.from('plans').insert({ name, price, max_products: mx, max_orders_month: mo, description: clean(fd.get('description'), 300) })); await loadBase(); toast('Plan added.'); router(true);
   },
   async plansave(f, fd) {
-    const price = toInt(fd.get('price'), 0, 100000), mx = toInt(fd.get('max_products') || 0, 0, 100000), name = clean(fd.get('name'), 40); if (name.length < 2 || price === null || mx === null) throw new Error('Enter a name, a price in rupees and the product limit (0 = unlimited).');
-    must(await sb.from('plans').update({ name, price, max_products: mx, description: clean(fd.get('description'), 300), sort: toInt(fd.get('sort'), 0, 999) ?? 100, active: !!fd.get('active') }).eq('id', f.dataset.id)); await loadBase(); toast('Plan saved.'); router(true);
+    const price = toInt(fd.get('price'), 0, 100000), mx = toInt(fd.get('max_products') || 0, 0, 100000), mo = toInt(fd.get('max_orders_month') || 0, 0, 1000000), name = clean(fd.get('name'), 40); if (name.length < 2 || price === null || mx === null || mo === null) throw new Error('Enter a name, a price in rupees and the limits (0 = unlimited).');
+    must(await sb.from('plans').update({ name, price, max_products: mx, max_orders_month: mo, description: clean(fd.get('description'), 300), sort: toInt(fd.get('sort'), 0, 999) ?? 100, active: !!fd.get('active') }).eq('id', f.dataset.id)); await loadBase(); toast('Plan saved.'); router(true);
   },
   async ticketsave(f, fd) { must(await sb.from('tickets').update({ status: fd.get('status'), admin_note: cleanML(fd.get('admin_note'), 500) }).eq('id', f.dataset.id)); toast('Ticket updated.'); },
   async adminsettings(f, fd) {
@@ -1317,7 +1421,7 @@ const forms = {
     const upi = clean(fd.get('upi_id'), 60), rzk = clean(fd.get('razorpay_key_id'), 60);
     if (upi && !/^[\w.\-]{2,}@[A-Za-z]{2,}$/.test(upi)) throw new Error('UPI ID looks wrong. It should look like name@bank.'); if (rzk && !/^rzp_(test|live)_[A-Za-z0-9]+$/.test(rzk)) throw new Error('Razorpay Key ID should start with rzp_live_ or rzp_test_. Never paste the Key Secret.');
     const wa = String(fd.get('contact_whatsapp') || '').trim(); const rows = [['site_name', clean(fd.get('site_name'), 40) || 'Nammude Kada'], ['commission_pct', String(pct)], ['contact_email', clean(fd.get('contact_email'), 120)], ['contact_phone', clean(fd.get('contact_phone'), 20)], ['contact_whatsapp', wa ? (normPhone(wa) || '') : ''],
-      ['promote_price_week', String(toInt(fd.get('promote_price_week') || 0, 0, 100000) || '')], ['ad_price_week', String(toInt(fd.get('ad_price_week') || 0, 0, 100000) || '')], ['upi_id', upi], ['upi_name', clean(fd.get('upi_name'), 40)], ['razorpay_key_id', rzk], ['contact_address', cleanML(fd.get('contact_address'), 300)], ['operator_name', clean(fd.get('operator_name'), 120)], ['featured_price_note', cleanML(fd.get('featured_price_note'), 400)], ['ad_note', cleanML(fd.get('ad_note'), 400)]];
+      ['promote_price_day', String(toInt(fd.get('promote_price_day') || 0, 0, 100000) || '')], ['ad_price_day', String(toInt(fd.get('ad_price_day') || 0, 0, 100000) || '')], ['upi_id', upi], ['upi_name', clean(fd.get('upi_name'), 40)], ['razorpay_key_id', rzk], ['contact_address', cleanML(fd.get('contact_address'), 300)], ['operator_name', clean(fd.get('operator_name'), 120)], ['featured_price_note', cleanML(fd.get('featured_price_note'), 400)], ['ad_note', cleanML(fd.get('ad_note'), 400)]];
     must(await sb.from('settings').upsert(rows.map(([key, value]) => ({ key, value })), { onConflict: 'key' })); await loadBase(); renderChrome(); toast('Settings saved.');
   },
 };
@@ -1367,6 +1471,8 @@ function setupManifest() {
   } catch (e) { /* optional */ }
 }
 
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); S.installEvt = e; if (sb) renderChrome(); });
+window.addEventListener('appinstalled', () => { S.installEvt = null; });
 async function boot() {
   if (!configured() || !window.supabase) { appEl().innerHTML = needsSetup().s; $('#top').innerHTML = `<a class="brand" href="#/">🛍️ ${esc(CONFIG && 'Nammude Kada')}</a>`; return; }
   sb = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
